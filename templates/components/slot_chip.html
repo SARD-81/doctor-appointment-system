@@ -1,0 +1,16 @@
+{% if disabled %}
+    <span class="slot-chip slot-chip--disabled" aria-disabled="true">
+        <i class="bi bi-clock"></i>
+        {{ label }}
+    </span>
+{% else %}
+    <button
+        class="slot-chip {% if selected %}slot-chip--selected{% endif %}"
+        type="button"
+        {% if value %}value="{{ value }}"{% endif %}
+        {% if name %}name="{{ name }}"{% endif %}
+    >
+        <i class="bi bi-clock"></i>
+        {{ label }}
+    </button>
+{% endif %}

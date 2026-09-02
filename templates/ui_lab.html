@@ -1,0 +1,241 @@
+{% extends "base.html" %}
+
+{% block title %}آزمایشگاه رابط کاربری{% endblock %}
+
+{% block content %}
+<section class="ui-lab">
+    <div class="container">
+        <div class="ui-lab__hero" data-reveal>
+            <div>
+                <span class="eyebrow">
+                    <i class="bi bi-grid-1x2"></i>
+                    Design System Lab
+                </span>
+                <h1>آزمایشگاه رابط کاربری</h1>
+                <p>
+                    مرجع داخلی کامپوننت‌ها، Stateها و قواعد بصری پروژه.
+                    این صفحه فقط در حالت توسعه در دسترس است.
+                </p>
+            </div>
+
+            <div class="ui-lab__meta">
+                <span class="status-badge status-badge--success">
+                    <i class="bi bi-check-circle"></i>
+                    UI Foundation
+                </span>
+                <span class="status-badge status-badge--info">
+                    RTL / Responsive
+                </span>
+            </div>
+        </div>
+
+        <nav class="ui-lab__nav" aria-label="بخش‌های آزمایشگاه" data-reveal>
+            <a href="#buttons">دکمه‌ها</a>
+            <a href="#forms">فرم‌ها</a>
+            <a href="#badges">وضعیت‌ها</a>
+            <a href="#doctors">کارت پزشک</a>
+            <a href="#slots">نوبت‌ها</a>
+            <a href="#states">Stateها</a>
+            <a href="#auth">Auth</a>
+        </nav>
+
+        <section id="buttons" class="ui-lab__section" data-reveal>
+            <div class="ui-lab__section-head">
+                <div>
+                    <span>01</span>
+                    <h2>Buttons & Actions</h2>
+                </div>
+                <p>Action hierarchy باید در همه صفحات ثابت بماند.</p>
+            </div>
+
+            <div class="ui-lab__surface">
+                <div class="ui-lab__row">
+                    <button class="btn btn-primary app-btn" type="button">عملیات اصلی</button>
+                    <button class="btn btn-ghost app-btn" type="button">عملیات ثانویه</button>
+                    <button class="btn btn-primary app-btn app-btn--sm" type="button">نسخه کوچک</button>
+                    <button class="btn btn-primary app-btn" type="button" disabled>غیرفعال</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="forms" class="ui-lab__section" data-reveal>
+            <div class="ui-lab__section-head">
+                <div>
+                    <span>02</span>
+                    <h2>Form System</h2>
+                </div>
+                <p>نمونه Stateهای ورودی بدون وابستگی به Business Logic.</p>
+            </div>
+
+            <div class="ui-lab__surface">
+                <div class="ui-lab__form-grid">
+                    <div class="app-field">
+                        <div class="app-field__label-row">
+                            <label class="app-field__label" for="demo-email">
+                                ایمیل
+                                <span class="app-field__required">*</span>
+                            </label>
+                        </div>
+                        <div class="app-field__control">
+                            <input id="demo-email" type="email" placeholder="name@example.com">
+                        </div>
+                        <div class="app-field__help">ایمیل برای ورود و دریافت OTP استفاده می‌شود.</div>
+                    </div>
+
+                    <div class="app-field app-field--invalid">
+                        <div class="app-field__label-row">
+                            <label class="app-field__label" for="demo-invalid">شماره تماس</label>
+                        </div>
+                        <div class="app-field__control">
+                            <input id="demo-invalid" type="text" value="0912">
+                        </div>
+                        <div class="app-field__errors" role="alert">
+                            <span>
+                                <i class="bi bi-exclamation-circle"></i>
+                                شماره تماس کامل نیست.
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="badges" class="ui-lab__section" data-reveal>
+            <div class="ui-lab__section-head">
+                <div>
+                    <span>03</span>
+                    <h2>Status & Rating</h2>
+                </div>
+                <p>رنگ فقط برای معنا استفاده می‌شود، نه تزئین.</p>
+            </div>
+
+            <div class="ui-lab__surface">
+                <div class="ui-lab__row">
+                    {% include "components/status_badge.html" with label="تأیید شده" tone="success" icon="bi-check-circle" %}
+                    {% include "components/status_badge.html" with label="در انتظار" tone="warning" icon="bi-clock" %}
+                    {% include "components/status_badge.html" with label="لغو شده" tone="danger" icon="bi-x-circle" %}
+                    {% include "components/status_badge.html" with label="اطلاعات" tone="info" icon="bi-info-circle" %}
+                    {% include "components/status_badge.html" with label="خنثی" tone="neutral" %}
+                    {% include "components/rating.html" with rating="4.8" reviews_count=32 %}
+                </div>
+            </div>
+        </section>
+
+        <section id="doctors" class="ui-lab__section" data-reveal>
+            <div class="ui-lab__section-head">
+                <div>
+                    <span>04</span>
+                    <h2>Doctor Cards</h2>
+                </div>
+                <p>مهم‌ترین Product Component برای تجربه جستجو و رزرو.</p>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    {% include "components/doctor_card.html" with name="دکتر سارا احمدی" specialty="متخصص قلب و عروق" initials="س" rating="4.8" reviews_count=32 fee="۳۵۰٬۰۰۰ تومان" next_slot="امروز، ۱۸:۳۰" verified=True %}
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    {% include "components/doctor_card.html" with name="دکتر علی رضایی" specialty="متخصص پوست و مو" initials="ع" rating="4.6" reviews_count=18 fee="۲۸۰٬۰۰۰ تومان" next_slot="فردا، ۱۰:۰۰" verified=True %}
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    {% include "components/skeleton_doctor_card.html" %}
+                </div>
+            </div>
+        </section>
+
+        <section id="slots" class="ui-lab__section" data-reveal>
+            <div class="ui-lab__section-head">
+                <div>
+                    <span>05</span>
+                    <h2>Appointment Slots</h2>
+                </div>
+                <p>حالت عادی، انتخاب‌شده و غیرقابل انتخاب.</p>
+            </div>
+
+            <div class="ui-lab__surface">
+                <div class="ui-lab__row">
+                    {% include "components/slot_chip.html" with label="۰۹:۳۰" %}
+                    {% include "components/slot_chip.html" with label="۱۰:۰۰" %}
+                    {% include "components/slot_chip.html" with label="۱۰:۳۰" selected=True %}
+                    {% include "components/slot_chip.html" with label="۱۱:۰۰" disabled=True %}
+                </div>
+            </div>
+        </section>
+
+        <section id="states" class="ui-lab__section" data-reveal>
+            <div class="ui-lab__section-head">
+                <div>
+                    <span>06</span>
+                    <h2>Empty / Error / Feedback</h2>
+                </div>
+                <p>صفحه نباید فقط Happy Path داشته باشد.</p>
+            </div>
+
+            <div class="ui-lab__state-grid">
+                <div class="ui-lab__surface">
+                    {% include "components/empty_state.html" with icon="bi-search" title="پزشکی پیدا نشد" description="عبارت جستجو یا تخصص انتخابی را تغییر دهید." %}
+                </div>
+
+                <div class="ui-lab__surface">
+                    <div class="alert alert-danger app-alert mb-3" role="alert">
+                        <strong>اتصال برقرار نشد.</strong>
+                        دوباره تلاش کنید.
+                    </div>
+                    <div class="alert alert-success app-alert mb-0" role="alert">
+                        <strong>رزرو انجام شد.</strong>
+                        تأیید نوبت برای شما ارسال می‌شود.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="auth" class="ui-lab__section" data-reveal>
+            <div class="ui-lab__section-head">
+                <div>
+                    <span>07</span>
+                    <h2>Authentication Surface</h2>
+                </div>
+                <p>نمونه فرم Auth برای هماهنگی با Feature امیررضا.</p>
+            </div>
+
+            <div class="ui-lab__auth-preview">
+                <div class="auth-card">
+                    <div class="auth-card__header">
+                        <span class="eyebrow">حساب کاربری</span>
+                        <h1>ورود به حساب</h1>
+                        <p>برای مدیریت نوبت‌ها وارد حساب خود شوید.</p>
+                    </div>
+
+                    <div class="auth-card__body">
+                        <form class="app-form" action="#" onsubmit="return false;">
+                            <div class="app-field">
+                                <div class="app-field__label-row">
+                                    <label class="app-field__label" for="auth-email">ایمیل</label>
+                                </div>
+                                <div class="app-field__control">
+                                    <input id="auth-email" type="email" placeholder="name@example.com">
+                                </div>
+                            </div>
+
+                            <div class="app-field">
+                                <div class="app-field__label-row">
+                                    <label class="app-field__label" for="auth-password">رمز عبور</label>
+                                </div>
+                                <div class="app-field__control">
+                                    <input id="auth-password" type="password" placeholder="••••••••">
+                                </div>
+                            </div>
+
+                            <button class="btn btn-primary app-btn w-100" type="submit">
+                                ورود
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</section>
+{% endblock %}

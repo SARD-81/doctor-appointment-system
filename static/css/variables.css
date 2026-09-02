@@ -1,0 +1,58 @@
+:root {
+    --color-primary: #0f6b6d;
+    --color-primary-hover: #0c5d5f;
+    --color-primary-dark: #0a5052;
+    --color-primary-soft: #e8f6f5;
+    --color-secondary: #173b57;
+    --color-accent: #55c7c0;
+
+    --color-bg: #f6f9fb;
+    --color-surface: #ffffff;
+    --color-surface-soft: #eef5f7;
+    --color-text: #102a43;
+    --color-muted: #627d98;
+    --color-border: #dce6ec;
+    --color-border-strong: #c8d7e0;
+
+    --color-success: #1d8f63;
+    --color-success-soft: #e9f8f1;
+    --color-warning: #bd7b08;
+    --color-warning-soft: #fff6df;
+    --color-danger: #c94a4a;
+    --color-danger-soft: #fff0f0;
+    --color-info: #2d6f9f;
+    --color-info-soft: #edf6fc;
+
+    --shadow-xs: 0 4px 14px rgba(16, 42, 67, 0.04);
+    --shadow-sm: 0 8px 24px rgba(16, 42, 67, 0.06);
+    --shadow-md: 0 18px 50px rgba(16, 42, 67, 0.10);
+    --shadow-lg: 0 28px 80px rgba(16, 42, 67, 0.14);
+    --shadow-focus: 0 0 0 4px rgba(15, 107, 109, 0.14);
+
+    --radius-xs: 0.55rem;
+    --radius-sm: 0.75rem;
+    --radius-md: 1.25rem;
+    --radius-lg: 2rem;
+    --radius-pill: 999px;
+
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.25rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    --space-10: 2.5rem;
+    --space-12: 3rem;
+    --space-16: 4rem;
+    --space-20: 5rem;
+    --space-24: 6rem;
+
+    --container-narrow: 760px;
+
+    --duration-fast: 140ms;
+    --duration-base: 200ms;
+    --duration-slow: 360ms;
+    --ease-standard: cubic-bezier(0.2, 0.7, 0.2, 1);
+    --transition: var(--duration-base) var(--ease-standard);
+}
