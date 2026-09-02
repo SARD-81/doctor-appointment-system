@@ -162,3 +162,29 @@ A branch is ready for review only when:
 - All tests pass.
 - Required migrations are included.
 - No secrets or unrelated changes are present.
+
+## Local Branch Safety
+
+Because server-side branch protection is not available for the current private repository plan, every team member must enable the versioned Git pre-push hook after cloning.
+
+Run:
+
+```bash
+./scripts/setup-git-hooks.sh
+```
+
+Verify:
+
+```bash
+git config --get core.hooksPath
+```
+
+Expected value:
+
+```text
+.githooks
+```
+
+The hook blocks direct pushes to `main` and `develop`.
+
+This hook is an additional local safety mechanism and does not replace Pull Requests, CI, or code review.

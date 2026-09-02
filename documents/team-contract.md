@@ -53,3 +53,22 @@ The Team Lead owns final integration decisions.
 `main` represents stable release-ready code.
 
 Only tested code from `develop` may be promoted to `main`.
+
+## Local Git Safety
+
+All team members must enable the repository Git hooks after cloning:
+
+```bash
+./scripts/setup-git-hooks.sh
+```
+
+Direct pushes to `main` and `develop` are prohibited. The local pre-push hook exists to prevent accidental violations of this rule.
+
+Because the current private repository plan does not provide server-side branch protection, compliance with the Pull Request workflow is a mandatory team responsibility.
+
+## Review Responsibility
+
+- Pull Requests created by Mahsa or Amirreza require Team Lead review before merge.
+- Pull Requests created by the Team Lead should be reviewed by at least one other team member when practical.
+- A green CI run is required before any merge.
+- Squash Merge is the standard merge strategy.
