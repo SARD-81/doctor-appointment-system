@@ -67,6 +67,34 @@ function initPasswordToggles() {
     });
 }
 
+function initSlotSelection() {
+    const slotRadios = Array.from(document.querySelectorAll("[data-slot-radio]"));
+
+    if (!slotRadios.length) {
+        return;
+    }
+
+    const syncGroup = (activeRadio) => {
+        slotRadios
+            .filter(
+                (candidate) =>
+                    candidate.name === activeRadio.name &&
+                    candidate.form === activeRadio.form
+            )
+            .forEach((candidate) => {
+                const chip = candidate.closest(".slot-chip");
+                if (chip) {
+                    chip.classList.toggle("slot-chip--selected", candidate.checked);
+                }
+            });
+    };
+
+    slotRadios.forEach((radio) => {
+        syncGroup(radio);
+        radio.addEventListener("change", () => syncGroup(radio));
+    });
+}
+
 function initBootstrapMobileNav() {
     const navbar = document.getElementById("mainNavbar");
 
@@ -89,5 +117,6 @@ document.addEventListener("DOMContentLoaded", () => {
     initRevealMotion();
     initHeaderState();
     initPasswordToggles();
+    initSlotSelection();
     initBootstrapMobileNav();
 });
