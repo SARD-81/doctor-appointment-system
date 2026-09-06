@@ -78,9 +78,25 @@ Available tones:
 
 ## Appointment Slot
 
+For display-only usage:
+
 ```django
 {% include "components/slot_chip.html" with label="۱۸:۳۰" %}
 ```
+
+For a real booking form, pass both `name` and `value` so the component renders a native radio control whose selected value is submitted with the form:
+
+```django
+{% include "components/slot_chip.html" with
+    label="۱۸:۳۰"
+    name="slot"
+    value=slot.id
+    selected=slot.is_selected
+    disabled=slot.is_unavailable
+%}
+```
+
+Slot selection uses native radio semantics. The shared JavaScript only synchronizes the visual selected state; form submission does not depend on JavaScript.
 
 Supported states:
 
