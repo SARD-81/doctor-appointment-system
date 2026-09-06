@@ -56,15 +56,25 @@ def generate_and_send_otp(email: str) -> tuple[bool, str]:
         cache.incr(rate_limit_key)
 
     # ارسال رسمی از طریق Django Email Backend
-    subject = "کد تأیید ثبت‌نام"
-    message = f"کد یک‌بار مصرف شما: {otp}\nاین کد تا ۵ دقیقه معتبر است."
-    send_mail(
-        subject=subject,
-        message=message,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[email.strip().lower()],
-        fail_silently=False,
-    )
+    try:
+        subject = "کد تأیید ثبت‌نام"
+        message = f"کد یک‌بار مصرف شما: {otp}\nاین کد تا ۵ دقیقه معتبر است."
+        send_mail(
+            subject=subject,
+            message=message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[email.strip().lower()],
+            fail_silently=False,
+        )
+    except Exception:
+        # پاکسازی وضعیت‌های ذخیره‌شده در کش برای جلوگیری از گیر افتادن کاربر
+        cache.delete(otp_key)
+        cache.delete(cooldown_key)
+        cache.delete(attempts_key)
+        return (
+            False,
+            "خطا در ارسال ایمیل. لطفاً دقایقی دیگر مجدداً تلاش نمایید.",
+        )
 
     return True, "کد تأیید با موفقیت ارسال شد."
 
