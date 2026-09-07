@@ -27,7 +27,7 @@ Optional OAuth remains bonus scope and is not required by the baseline.
 
 - On `develop`, `User` derives from Django `AbstractUser` and has unique email; this matches the baseline.
 - Issue #2 requires the Doctor catalog boundary to contain only `Specialty` and `Doctor`. The current `feature/doctor-domain` branch still contains later-domain models, so that branch is treated as work in progress rather than final architecture.
-- The current authentication branch provides implementation evidence for an Email + Django Cache OTP direction with expiry, cooldown, attempt limiting, rate limiting, hashed storage, and one-time consumption. ADR-012 remains pending final review/merge confirmation rather than being silently frozen from branch code.
+- The current authentication branch provides implementation evidence for an Email + Django Cache OTP direction with expiry, cooldown, attempt limiting, rate limiting, hashed storage, one-time consumption, registration/OTP/login forms, and a custom email authentication backend. ADR-012 remains pending final review/merge confirmation rather than being silently frozen from branch code.
 
 ## Decision summary
 
@@ -39,7 +39,7 @@ Optional OAuth remains bonus scope and is not required by the baseline.
 | ADR-004 | AppointmentSlot is separate from Appointment; availability is derived |
 | ADR-005 | Store current doctor fee and appointment payment snapshot |
 | ADR-006 | Wallet includes a transaction ledger |
-| ADR-007 | WalletTransaction may reference Appointment; top-up has no appointment |
+| ADR-007 | WalletTransaction may reference Appointment; top-up has no appointment; max one appointment-payment trace per Appointment |
 | ADR-008 | Maximum one Review per completed Appointment |
 | ADR-009 | Admin marks Appointment completed and completion is auditable |
 | ADR-010 | Cancellation/refund are outside baseline scope |
@@ -52,7 +52,7 @@ Detailed rationale is preserved in [the ADR index](../adr/README.md).
 
 Core entities are `User`, `Specialty`, `Doctor`, `AppointmentSlot`, `Appointment`, `Wallet`, `WalletTransaction`, and `Review`. OTP persistence is intentionally excluded until ADR-012 is finalized.
 
-Key constraints include unique user email, unique specialty name, non-negative visit fee, unique `(doctor, starts_at)` slot, unique appointment slot, non-negative payment snapshot, one wallet per user with non-negative balance, positive ledger amounts, and one review per appointment with rating 1..5.
+Key constraints include unique user email, unique specialty name, non-negative visit fee, unique `(doctor, starts_at)` slot, unique appointment slot, non-negative payment snapshot, one wallet per user with non-negative balance, positive ledger amounts, one optional payment trace per Appointment, transaction/reference consistency for `TOP_UP` vs `APPOINTMENT_PAYMENT`, and one review per appointment with rating 1..5.
 
 See [ERD](erd.md).
 
@@ -62,7 +62,8 @@ See [ERD](erd.md).
 - Slot and wallet rows are locked during booking.
 - Review is allowed only for `COMPLETED` appointments.
 - `completed_by` must represent an authorized staff/admin user.
-- Booking confirmation email is sent only after successful commit.
+- Booking confirmation email is scheduled only after successful database commit.
+- Notification/email failure after commit is operationally separate from booking success: it must not convert an already committed booking/payment into a failed booking response or encourage a duplicate retry. The notification failure must be isolated and handled separately (log/retry/report).
 
 ## Appointment lifecycle
 
@@ -89,10 +90,19 @@ Cancellation and refund are intentionally outside Architecture Baseline v1.0.
 5. Create `Appointment(status=CONFIRMED)` with `amount_paid` as the fee snapshot.
 6. Debit Wallet balance.
 7. Create `WalletTransaction(type=APPOINTMENT_PAYMENT, appointment=<created>)`.
-8. Commit the database transaction.
-9. After commit, send booking confirmation email.
+8. Register the booking-confirmation notification for post-commit execution.
+9. Commit the database transaction.
+10. Run the booking-confirmation notification only after commit.
+11. Return the committed Appointment result to the view regardless of notification delivery success; notification failure is isolated and handled separately.
 
-Failure contract: unavailable slot, insufficient balance, or database errors must leave no partial booking or wallet debit.
+Failure contract:
+
+- unavailable/already-booked slot -> no wallet change;
+- insufficient balance -> no Appointment or payment ledger row;
+- database error -> rollback all database writes;
+- post-commit notification failure -> booking/payment remain committed and are still treated as success; notification handling is logged/retried/reported separately.
+
+No partial booking or wallet debit may remain after a database failure.
 
 See [Booking Sequence UML](uml-booking-sequence.md).
 

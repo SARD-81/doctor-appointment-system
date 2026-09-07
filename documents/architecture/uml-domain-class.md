@@ -84,7 +84,7 @@ classDiagram
     AppointmentSlot "1" --> "0..1" Appointment
     User "1" --> "1" Wallet
     Wallet "1" --> "*" WalletTransaction
-    Appointment "0..1" --> "*" WalletTransaction : payment trace
+    Appointment "0..1" --> "0..1" WalletTransaction : payment trace
     Appointment "1" --> "0..1" Review
 
     BookingService ..> AppointmentSlot
@@ -105,5 +105,6 @@ classDiagram
 - `BookingService` owns the atomic booking orchestration and race-condition-sensitive locks.
 - `WalletService` owns wallet mutations and ledger creation.
 - `ReviewService` enforces the completed-appointment eligibility rule.
-- `NotificationService` is invoked only after successful booking commit.
+- `NotificationService` is invoked only after successful booking commit, and notification failure must be isolated from the already-committed booking result.
+- An Appointment has at most one baseline `APPOINTMENT_PAYMENT` ledger trace; a `WalletTransaction` references at most one Appointment and `TOP_UP` references none.
 - OTP behavior is represented as a service boundary; persistence remains governed by ADR-012.

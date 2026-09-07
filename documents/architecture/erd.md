@@ -11,7 +11,7 @@ erDiagram
     DOCTOR ||--o{ APPOINTMENT_SLOT : offers
     APPOINTMENT_SLOT ||--o| APPOINTMENT : becomes
     WALLET ||--o{ WALLET_TRANSACTION : records
-    APPOINTMENT o|--o{ WALLET_TRANSACTION : payment_trace
+    APPOINTMENT o|--o| WALLET_TRANSACTION : payment_trace
     APPOINTMENT ||--o| REVIEW : receives
 
     USER {
@@ -99,6 +99,8 @@ erDiagram
 - `Wallet.balance >= 0`.
 - `WalletTransaction.amount > 0`.
 - `WalletTransaction.balance_after >= 0`.
+- Baseline payment trace is optional one-to-one: a non-null `WalletTransaction.appointment_id` must be unique so an Appointment cannot receive duplicate `APPOINTMENT_PAYMENT` ledger rows.
+- Transaction/reference consistency must be enforced: `APPOINTMENT_PAYMENT` requires `appointment_id IS NOT NULL`, while `TOP_UP` requires `appointment_id IS NULL`.
 - `Review.appointment_id` unique.
 - `Review.rating` between 1 and 5.
 
@@ -106,6 +108,6 @@ erDiagram
 
 - Slot availability is derived from the existence/absence of an Appointment plus slot activity; no independent `is_booked` field is part of the baseline.
 - `Appointment.amount_paid` is a historical fee snapshot.
-- `WalletTransaction.appointment_id` is nullable because `TOP_UP` has no appointment.
-- For `APPOINTMENT_PAYMENT`, an appointment reference is required by the application contract.
+- `WalletTransaction.appointment_id` remains nullable because `TOP_UP` has no appointment.
+- ADR-007 already limits baseline scope to at most one appointment-payment transaction per Appointment; the optional one-to-one cardinality and uniqueness rule above make that existing contract explicit at storage level.
 - OTP persistence remains outside the ERD until ADR-012 is finalized.

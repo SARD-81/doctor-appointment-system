@@ -69,7 +69,15 @@ This index preserves traceability for ADR-001 through ADR-012. Statuses describe
 
 **Rationale:** `TOP_UP` has no appointment, while appointment payments must remain traceable to the booked appointment.
 
-**Contract:** `APPOINTMENT_PAYMENT` requires an Appointment; `TOP_UP` requires Appointment = NULL; baseline scope allows at most one appointment-payment transaction for an Appointment.
+**Contract:**
+
+- `APPOINTMENT_PAYMENT` requires an Appointment.
+- `TOP_UP` requires Appointment = NULL.
+- Baseline scope allows at most one `APPOINTMENT_PAYMENT` transaction for an Appointment.
+- The storage contract must enforce that stated maximum cardinality: a non-null `appointment_id` is unique for the baseline transaction types (or an equivalent conditional unique constraint is used for `APPOINTMENT_PAYMENT`). Multiple `TOP_UP` rows remain valid because their appointment reference is NULL.
+- Transaction type and appointment nullability must be kept consistent with a database/application constraint rather than relying only on presentation logic.
+
+This clarification makes the already-agreed “at most one appointment payment per Appointment” rule explicit in the ERD/storage contract; it does not add a new payment requirement.
 
 ## ADR-008 — Max one Review per completed Appointment
 
@@ -127,17 +135,11 @@ The current `feature/account-authentication` branch uses:
 - Maximum 5 requests per 15-minute window.
 - One-time consumption by deleting OTP state after successful verification.
 - A new OTP replaces the previous cached OTP value for the same email.
+- Registration/OTP/login forms and a custom email authentication backend are now present as additional implementation evidence, but Issue #15 remains the backend-contract review gate.
 
 ### Evidence still requiring review before Accepted/Frozen
 
-Issue #15 still requires additional/fixed tests and flow behavior, including:
-
-- a real 5-requests-per-15-minutes rate-limit test rather than only immediate cooldown behavior;
-- an explicit one-time-use test;
-- a resend test proving the previous OTP becomes invalid;
-- deterministic invalid-code testing;
-- safe handling of email-send failure so stale OTP/cooldown state does not block the user;
-- end-to-end registration, verification, resend, login, and logout integration tests.
+Issue #15 remains open and still governs final backend/forms/authentication-contract acceptance, including correct email authentication behavior, inactive-user rejection, form validation/password handling, and the completed OTP lifecycle test suite.
 
 Therefore the implementation direction is documented, but ADR-012 is not silently promoted to Accepted/Frozen until Issue #15 review/merge or explicit team confirmation.
 

@@ -35,12 +35,22 @@ sequenceDiagram
                 Service->>Appointment: CREATE CONFIRMED + amount_paid snapshot
                 Service->>Wallet: UPDATE balance = balance - fee
                 Service->>Ledger: CREATE APPOINTMENT_PAYMENT + FK Appointment
+                Service->>Service: register post-commit notification callback
                 Note over Service,Ledger: COMMIT
-                Service->>Email: transaction.on_commit(send confirmation)
-                Service-->>View: Appointment
-                View-->>Patient: HTTP success / confirmation page
             end
         end
+    end
+
+    opt booking transaction committed
+        Service->>Email: run post-commit booking confirmation
+        alt notification succeeds
+            Email-->>Service: sent
+        else notification fails
+            Email-->>Service: failure
+            Note over Service,View: isolate/log/retry notification failure; committed booking remains success
+        end
+        Service-->>View: Appointment
+        View-->>Patient: HTTP success / confirmation page
     end
 
     Note over Service,Ledger: Any DB error rolls back all writes; no partial booking or debit
@@ -52,5 +62,6 @@ sequenceDiagram
 - Wallet row lock before balance validation/debit.
 - Appointment stores the fee snapshot.
 - Wallet and ledger mutations are in the same transaction.
-- Email is a post-commit side effect.
-- Failure paths must leave no partial booking/payment state.
+- The notification callback is registered for post-commit execution; email is never part of the database transaction.
+- A post-commit email failure must not turn an already committed booking/payment into an HTTP booking failure. The implementation must isolate the callback exception and log/retry/report the notification separately (for example, Django `transaction.on_commit(..., robust=True)` or an equivalent guarded/durable mechanism).
+- Database failure paths must leave no partial booking/payment state.
