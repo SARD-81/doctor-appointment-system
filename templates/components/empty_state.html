@@ -1,0 +1,16 @@
+<div class="empty-state" role="status">
+    <div class="empty-state__icon">
+        <i class="bi {{ icon|default:'bi-inbox' }}"></i>
+    </div>
+    <h3>{{ title|default:"موردی پیدا نشد" }}</h3>
+
+    {% if description %}
+        <p>{{ description }}</p>
+    {% endif %}
+
+    {% if action_url and action_label %}
+        <a class="btn btn-primary app-btn app-btn--sm" href="{{ action_url }}">
+            {{ action_label }}
+        </a>
+    {% endif %}
+</div>

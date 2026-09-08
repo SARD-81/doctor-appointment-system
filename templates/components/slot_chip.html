@@ -1,0 +1,31 @@
+{% if name and value %}
+    <label
+        class="slot-chip {% if selected %}slot-chip--selected{% endif %} {% if disabled %}slot-chip--disabled{% endif %}"
+        {% if disabled %}aria-disabled="true"{% endif %}
+    >
+        <input
+            class="form-check-input m-0"
+            type="radio"
+            name="{{ name }}"
+            value="{{ value }}"
+            data-slot-radio
+            {% if selected %}checked{% endif %}
+            {% if disabled %}disabled{% endif %}
+        >
+        <i class="bi bi-clock"></i>
+        {{ label }}
+    </label>
+{% elif disabled %}
+    <span class="slot-chip slot-chip--disabled" aria-disabled="true">
+        <i class="bi bi-clock"></i>
+        {{ label }}
+    </span>
+{% else %}
+    <button
+        class="slot-chip {% if selected %}slot-chip--selected{% endif %}"
+        type="button"
+    >
+        <i class="bi bi-clock"></i>
+        {{ label }}
+    </button>
+{% endif %}
