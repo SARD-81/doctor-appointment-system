@@ -5,49 +5,52 @@ User = get_user_model()
 
 
 class UserRegisterForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput())
-    confirm_password = forms.CharField(widget=forms.PasswordInput())
+    """فرم ثبت‌نام اولیه کاربر و اعتبارسنجی اطلاعات هویتی."""
+
+    password = forms.CharField(
+        widget=forms.PasswordInput(),
+        label="رمز عبور",
+    )
+    confirm_password = forms.CharField(
+        widget=forms.PasswordInput(),
+        label="تکرار رمز عبور",
+    )
 
     class Meta:
         model = User
         fields = ("username", "email", "password")
 
     def clean(self):
+        """بررسی تطابق کلمه‌های عبور وارد شده."""
         cleaned_data = super().clean()
         password = cleaned_data.get("password")
         confirm_password = cleaned_data.get("confirm_password")
 
-        # بررسی تطابق پسوردها
         if password and confirm_password and password != confirm_password:
-            raise forms.ValidationError("رمزهای عبور با هم مطابقت ندارند.")
+            self.add_error("confirm_password", "رمزهای عبور با هم مطابقت ندارند.")
 
         return cleaned_data
 
     def clean_email(self):
+        """اعتبارسنجی یکتایی ایمیل به صورت غیرحساس به حروف بزرگ و کوچک (Case-Insensitive)."""
         email = self.cleaned_data.get("email")
         if email:
-            email = email.lower()
-            # بررسی یکتایی ایمیل
-            if User.objects.filter(email=email).exists():
+            if User.objects.filter(email__iexact=email).exists():
                 raise forms.ValidationError("این ایمیل قبلاً ثبت‌ نام کرده است.")
         return email
 
     def clean_username(self):
+        """اعتبارسنجی یکتایی نام کاربری در سیستم."""
         username = self.cleaned_data.get("username")
         if username:
-            # بررسی یکتایی نام کاربری
             if User.objects.filter(username=username).exists():
                 raise forms.ValidationError("این نام کاربری قبلاً انتخاب شده است.")
         return username
 
     def save(self, commit=True):
-        # ساخت کاربر بدون ذخیره نهایی در دیتابیس برای اعمال تغییرات
+        """ذخیره کاربر با وضعیت غیرفعال (is_active=False) تا زمان تایید نهایی OTP."""
         user = super().save(commit=False)
-
-        # تنظیم وضعیت کاربر به غیرفعال (تا زمان تایید OTP)
         user.is_active = False
-
-        # هش کردن امن رمز عبور
         user.set_password(self.cleaned_data.get("password"))
 
         if commit:
@@ -56,17 +59,25 @@ class UserRegisterForm(forms.ModelForm):
 
 
 class VerifyOTPForm(forms.Form):
-    code = forms.CharField(max_length=6, min_length=6, label="کد تایید")
+    """فرم اعتبارسنجی ساختار کد یک‌بار مصرف دریافتی از کاربر."""
+
+    code = forms.CharField(
+        max_length=6,
+        min_length=6,
+        label="کد تایید",
+    )
 
     def clean_code(self):
+        """بررسی عددی بودن کد و حفظ صفرهای اولیه (دقیقاً ۶ رقم)."""
         code = self.cleaned_data.get("code")
         if code:
-            # بررسی اینکه دقیقاً ۶ رقم و تماماً عددی باشد (حفظ صفرهای اولیه)
             if not code.isdigit() or len(code) != 6:
                 raise forms.ValidationError("کد تایید باید دقیقاً ۶ رقم عدد باشد.")
         return code
 
 
 class UserLoginForm(forms.Form):
+    """فرم ورود کاربران بر پایه ایمیل و رمز عبور."""
+
     email = forms.EmailField(label="ایمیل")
     password = forms.CharField(widget=forms.PasswordInput(), label="رمز عبور")
