@@ -42,6 +42,14 @@ Render a Django form field with:
 
 Feature forms should normally use the `.app-form` wrapper.
 
+For password fields that need the shared visibility control, opt in with:
+
+```django
+{% include "components/form_field.html" with field=form.password password_toggle=True %}
+```
+
+The component renders a `type="button"` toggle wired to the shared `main.js` password-visibility behavior. The native password input remains the submitted form control; the toggle only changes visibility and maintains `aria-pressed` state.
+
 ## Doctor Card
 
 The doctor card is intentionally presentation-oriented and avoids coupling to a specific model field layout.
