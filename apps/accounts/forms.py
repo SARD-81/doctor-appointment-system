@@ -1,5 +1,8 @@
+# apps/accounts/forms.py
 from django import forms
 from django.contrib.auth import get_user_model
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 
 User = get_user_model()
 
@@ -21,13 +24,21 @@ class UserRegisterForm(forms.ModelForm):
         fields = ("username", "email", "password")
 
     def clean(self):
-        """بررسی تطابق کلمه‌های عبور وارد شده."""
+        """بررسی تطابق کلمه‌های عبور وارد شده و اعتبارسنجی قدرت پسورد."""
         cleaned_data = super().clean()
         password = cleaned_data.get("password")
         confirm_password = cleaned_data.get("confirm_password")
 
+        # بررسی تطابق رمز عبور با تکرار آن
         if password and confirm_password and password != confirm_password:
             self.add_error("confirm_password", "رمزهای عبور با هم مطابقت ندارند.")
+
+        # اجرای ولیدیتورهای امنیتی جنگو (AUTH_PASSWORD_VALIDATORS)
+        if password:
+            try:
+                validate_password(password)
+            except ValidationError as error:
+                self.add_error("password", error)
 
         return cleaned_data
 

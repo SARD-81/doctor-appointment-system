@@ -1,3 +1,4 @@
+# apps/accounts/backends.py
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
 
@@ -26,10 +27,3 @@ class EmailAuthBackend(ModelBackend):
         if user.check_password(password) and self.user_can_authenticate(user):
             return user
         return None
-
-    def get_user(self, user_id):
-        """بازیابی کاربر بر اساس کلید اصلی برای مدیریت نشست (Session)."""
-        try:
-            return User.objects.get(pk=user_id)
-        except User.DoesNotExist:
-            return None

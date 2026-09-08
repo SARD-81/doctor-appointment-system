@@ -1,6 +1,8 @@
+# apps/accounts/tests/test_auth_backend.py
 import pytest
 from django.contrib.auth import authenticate, get_user_model
 
+from apps.accounts.backends import EmailAuthBackend
 from apps.accounts.forms import UserRegisterForm, VerifyOTPForm
 
 User = get_user_model()
@@ -80,6 +82,34 @@ def test_email_auth_backend_case_insensitive_login():
 
 
 @pytest.mark.django_db
+def test_email_auth_backend_get_user_active():
+    """متد get_user باید شیء کاربر فعال را برگرداند."""
+    user = User.objects.create_user(
+        username="active_session_user",
+        email="active_session@example.com",
+        password="SecurePassword123!",
+        is_active=True,
+    )
+    backend = EmailAuthBackend()
+    retrieved_user = backend.get_user(user.pk)
+    assert retrieved_user == user
+
+
+@pytest.mark.django_db
+def test_email_auth_backend_get_user_inactive():
+    """متد get_user برای کاربر غیرفعال باید مقدار None برگرداند (ابطال نشست)."""
+    user = User.objects.create_user(
+        username="inactive_session_user",
+        email="inactive_session@example.com",
+        password="SecurePassword123!",
+        is_active=False,
+    )
+    backend = EmailAuthBackend()
+    retrieved_user = backend.get_user(user.pk)
+    assert retrieved_user is None
+
+
+@pytest.mark.django_db
 def test_user_register_form_creates_inactive_user():
     """اطمینان از ایجاد کاربر با وضعیت غیرفعال (is_active=False) پس از ثبت‌نام اولیه."""
     data = {
@@ -152,6 +182,21 @@ def test_user_register_form_password_mismatch():
     )
     assert not form.is_valid()
     assert "رمزهای عبور با هم مطابقت ندارند." in form.errors["confirm_password"]
+
+
+@pytest.mark.django_db
+def test_user_register_form_weak_password():
+    """اعتبارسنجی اعمال قوانین امنیتی جنگو (validate_password) روی فرم ثبت‌نام."""
+    form = UserRegisterForm(
+        data={
+            "username": "weak_pwd_user",
+            "email": "weak@example.com",
+            "password": "123",
+            "confirm_password": "123",
+        }
+    )
+    assert not form.is_valid()
+    assert "password" in form.errors
 
 
 def test_verify_otp_form_validation():
