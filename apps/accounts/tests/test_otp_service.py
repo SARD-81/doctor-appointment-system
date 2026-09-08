@@ -122,20 +122,16 @@ def test_resend_invalidates_previous_otp_deterministic():
 
 
 def test_otp_cache_ttl_contract():
-    """بررسی قرارداد ذخیره شدن کد OTP در کش با طول عمر ۳۰۰ ثانیه (۵ دقیقه)."""
+    """بررسی قرارداد ذخیره شدن هش کد OTP در کش با طول عمر ۳۰۰ ثانیه (۵ دقیقه)."""
     email = "ttl_contract@example.com"
     with patch("apps.accounts.services.otp.cache.set") as mock_cache_set:
         generate_and_send_otp(email)
 
-        # پیدا کردن فراخوانی مربوط به ذخیره کد عددی OTP در کش
-        otp_calls = [call for call in mock_cache_set.call_args_list if str(call[0][1]).isdigit()]
-        assert len(otp_calls) > 0
+        otp_key = f"otp_value_{_get_email_key(email)}"
+        otp_call = next(call for call in mock_cache_set.call_args_list if call.args[0] == otp_key)
 
-        # بررسی اعمال مقدار ۳۰۰ ثانیه برای انقضای کش (آرگومان موقعیتی یا کلیدواژه‌ای)
-        call_args, call_kwargs = otp_calls[0]
-        timeout = call_kwargs.get("timeout") if "timeout" in call_kwargs else call_args[2]
-        assert timeout == OTP_TTL
-        assert timeout == 300
+        assert otp_call.kwargs["timeout"] == OTP_TTL
+        assert OTP_TTL == 300
 
 
 def test_rate_limit_after_five_requests():

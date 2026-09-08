@@ -212,3 +212,18 @@ def test_verify_otp_form_valid_with_leading_zero():
     form = VerifyOTPForm(data={"code": "001234"})
     assert form.is_valid()
     assert form.cleaned_data["code"] == "001234"
+
+
+@pytest.mark.django_db
+def test_user_register_form_password_similar_to_attributes():
+    """اعتبارسنجی رد رمز عبور به دلیل شباهت بیش از حد به نام کاربری یا ایمیل."""
+    form = UserRegisterForm(
+        data={
+            "username": "superpatient",
+            "email": "superpatient@example.com",
+            "password": "superpatient_123",
+            "confirm_password": "superpatient_123",
+        }
+    )
+    assert not form.is_valid()
+    assert "password" in form.errors
