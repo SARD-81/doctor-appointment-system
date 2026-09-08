@@ -1,0 +1,36 @@
+{% extends "layouts/auth.html" %}
+
+{% block title %}ساخت حساب | نوبت پزشک{% endblock %}
+
+{% block auth_eyebrow %}شروع عضویت{% endblock %}
+{% block auth_title %}ساخت حساب کاربری{% endblock %}
+{% block auth_description %}برای رزرو نوبت، ابتدا حساب خود را ایجاد و ایمیلتان را تأیید کنید.{% endblock %}
+
+{% block auth_content %}
+<form method="post" class="app-form" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+        <div class="app-form__errors" role="alert">
+            {% for error in form.non_field_errors %}
+                <span><i class="bi bi-exclamation-circle"></i>{{ error }}</span>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% include "components/form_field.html" with field=form.username %}
+    {% include "components/form_field.html" with field=form.email %}
+    {% include "components/form_field.html" with field=form.password password_toggle=True %}
+    {% include "components/form_field.html" with field=form.confirm_password password_toggle=True %}
+
+    <button type="submit" class="btn btn-primary app-btn w-100">
+        <i class="bi bi-person-plus"></i>
+        ساخت حساب
+    </button>
+</form>
+{% endblock %}
+
+{% block auth_footer %}
+<span>قبلاً حساب ساخته‌اید؟</span>
+<a href="{% url 'accounts:login' %}">ورود به حساب</a>
+{% endblock %}
