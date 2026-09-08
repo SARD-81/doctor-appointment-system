@@ -1,3 +1,52 @@
+from decimal import Decimal
 from django.test import TestCase
+from django.core.exceptions import ValidationError
+from django.db.utils import IntegrityError
+from apps.doctors.models import Specialty, Doctor
 
-# Create your tests here.
+
+class SpecialtyModelTest(TestCase):
+    def test_create_specialty_success(self):
+        specialty = Specialty.objects.create(name="قلب و عروق")
+        self.assertEqual(str(specialty), "قلب و عروق")
+
+    def test_specialty_name_unique(self):
+        Specialty.objects.create(name="چشم‌پزشکی")
+        with self.assertRaises(IntegrityError):
+            Specialty.objects.create(name="چشم‌پزشکی")
+
+
+class DoctorModelTest(TestCase):
+    def setUp(self):
+        self.specialty = Specialty.objects.create(name="عمومی")
+
+    def test_create_doctor_success(self):
+        doctor = Doctor.objects.create(
+            specialty=self.specialty,
+            full_name="علی رضایی",
+            visit_fee=Decimal("150000.00"),
+            is_active=True,
+        )
+        self.assertEqual(str(doctor), f"Dr. علی رضایی - {self.specialty.name}")
+        self.assertTrue(doctor.is_active)
+
+    def test_doctor_visit_fee_negative_constraint(self):
+        with self.assertRaises(IntegrityError):
+            Doctor.objects.create(
+                specialty=self.specialty,
+                full_name="پزشک تستی",
+                visit_fee=Decimal("-1000.00"),
+            )
+
+    def test_unique_doctor_per_specialty_constraint(self):
+        Doctor.objects.create(
+            specialty=self.specialty,
+            full_name="سارا احمدی",
+            visit_fee=Decimal("200000.00"),
+        )
+        with self.assertRaises(IntegrityError):
+            Doctor.objects.create(
+                specialty=self.specialty,
+                full_name="سارا احمدی",
+                visit_fee=Decimal("250000.00"),
+            )
