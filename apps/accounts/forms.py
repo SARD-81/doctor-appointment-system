@@ -24,19 +24,22 @@ class UserRegisterForm(forms.ModelForm):
         fields = ("username", "email", "password")
 
     def clean(self):
-        """بررسی تطابق کلمه‌های عبور وارد شده و اعتبارسنجی قدرت پسورد."""
+        """بررسی تطابق کلمه‌های عبور و اعتبارسنجی شباهت پسورد با مشخصات کاربری."""
         cleaned_data = super().clean()
         password = cleaned_data.get("password")
         confirm_password = cleaned_data.get("confirm_password")
+        username = cleaned_data.get("username")
+        email = cleaned_data.get("email")
 
         # بررسی تطابق رمز عبور با تکرار آن
         if password and confirm_password and password != confirm_password:
             self.add_error("confirm_password", "رمزهای عبور با هم مطابقت ندارند.")
 
-        # اجرای ولیدیتورهای امنیتی جنگو (AUTH_PASSWORD_VALIDATORS)
+        # اجرای ولیدیتورهای امنیتی جنگو با در نظر گرفتن نمونه کاربر موقت
         if password:
+            candidate_user = User(username=username or "", email=email or "")
             try:
-                validate_password(password)
+                validate_password(password, user=candidate_user)
             except ValidationError as error:
                 self.add_error("password", error)
 

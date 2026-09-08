@@ -8,6 +8,7 @@ from django.core.cache import cache
 from apps.accounts.services.otp import (
     MAX_ATTEMPTS,
     MAX_REQUESTS_PER_WINDOW,
+    OTP_TTL,
     _get_email_key,
     generate_and_send_otp,
     verify_otp,
@@ -120,18 +121,21 @@ def test_resend_invalidates_previous_otp_deterministic():
     assert verify_otp(email, "222222")[0] is True
 
 
-def test_otp_expired_after_ttl():
-    """بررسی رفتار سیستم در هنگام منقضی شدن کد بر اثر اتمام طول عمر ۵ دقیقه‌ای."""
-    email = "ttl_test@example.com"
-    generate_and_send_otp(email)
-    otp = _extract_otp_from_outbox(email)
+def test_otp_cache_ttl_contract():
+    """بررسی قرارداد ذخیره شدن کد OTP در کش با طول عمر ۳۰۰ ثانیه (۵ دقیقه)."""
+    email = "ttl_contract@example.com"
+    with patch("apps.accounts.services.otp.cache.set") as mock_cache_set:
+        generate_and_send_otp(email)
 
-    # شبیه‌سازی انقضای کلید کش در ردیس
-    cache.delete(f"otp_value_{_get_email_key(email)}")
+        # پیدا کردن فراخوانی مربوط به ذخیره کد عددی OTP در کش
+        otp_calls = [call for call in mock_cache_set.call_args_list if str(call[0][1]).isdigit()]
+        assert len(otp_calls) > 0
 
-    success, msg = verify_otp(email, otp)
-    assert success is False
-    assert "منقضی شده" in msg
+        # بررسی اعمال مقدار ۳۰۰ ثانیه برای انقضای کش (آرگومان موقعیتی یا کلیدواژه‌ای)
+        call_args, call_kwargs = otp_calls[0]
+        timeout = call_kwargs.get("timeout") if "timeout" in call_kwargs else call_args[2]
+        assert timeout == OTP_TTL
+        assert timeout == 300
 
 
 def test_rate_limit_after_five_requests():
