@@ -42,7 +42,7 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Doctor',
                 'verbose_name_plural': 'Doctors',
                 'indexes': [models.Index(fields=['specialty', 'is_active'], name='doctors_doc_special_e65ad0_idx')],
-                'constraints': [models.CheckConstraint(condition=models.Q(('visit_fee__gte', 0)), name='doctor_visit_fee_gte_zero'), models.UniqueConstraint(fields=('full_name', 'specialty'), name='unique_doctor_per_specialty')],
+                'constraints': [models.CheckConstraint(condition=models.Q(('visit_fee__gte', 0)),],
             },
         ),
     ]
