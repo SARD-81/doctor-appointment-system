@@ -15,8 +15,12 @@
 
             <div class="collapse navbar-collapse" id="mainNavbar">
                 <ul class="navbar-nav mx-lg-auto mb-3 mb-lg-0">
-                    <li class="nav-item"><a class="nav-link active" href="{% url 'home' %}">خانه</a></li>
-                    <li class="nav-item"><span class="nav-link nav-link--disabled">پزشکان</span></li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}">خانه</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.namespace == 'doctors' %}active{% endif %}" href="{% url 'doctors:list' %}">پزشکان</a>
+                    </li>
                     <li class="nav-item"><span class="nav-link nav-link--disabled">تخصص‌ها</span></li>
                 </ul>
 

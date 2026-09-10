@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}پزشکان | نوبت پزشک{% endblock %}
+{% block meta_description %}جستجو و فیلتر پزشکان فعال بر اساس نام و تخصص{% endblock %}
+
+{% block content %}
+<section class="doctor-discovery">
+    <div class="container">
+        <header class="doctor-discovery__header" data-reveal>
+            <span class="section-eyebrow">پزشک مناسب را پیدا کنید</span>
+            <h1>جستجوی پزشکان</h1>
+            <p>
+                نام پزشک یا تخصص موردنظر را انتخاب کنید تا سریع‌تر به گزینه مناسب برسید.
+            </p>
+        </header>
+
+        <form class="doctor-filter" method="get" action="{% url 'doctors:list' %}" role="search" data-reveal>
+            <div class="doctor-filter__field doctor-filter__field--search">
+                <label for="doctor-search">نام پزشک</label>
+                <div class="doctor-filter__input-wrap">
+                    <i class="bi bi-search" aria-hidden="true"></i>
+                    <input
+                        id="doctor-search"
+                        class="app-input"
+                        type="search"
+                        name="q"
+                        value="{{ query }}"
+                        placeholder="مثلاً سارا احمدی"
+                        autocomplete="off"
+                    >
+                </div>
+            </div>
+
+            <div class="doctor-filter__field">
+                <label for="doctor-specialty">تخصص</label>
+                <select id="doctor-specialty" class="app-input" name="specialty">
+                    <option value="">همه تخصص‌ها</option>
+                    {% for specialty in specialties %}
+                        <option value="{{ specialty.pk }}" {% if selected_specialty_id == specialty.pk %}selected{% endif %}>
+                            {{ specialty.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="doctor-filter__actions">
+                <button class="btn btn-primary app-btn" type="submit">
+                    <i class="bi bi-search" aria-hidden="true"></i>
+                    جستجو
+                </button>
+                {% if has_filters %}
+                    <a class="btn btn-ghost app-btn" href="{% url 'doctors:list' %}">
+                        پاک کردن فیلترها
+                    </a>
+                {% endif %}
+            </div>
+        </form>
+
+        {% if specialty_filter_invalid %}
+            <div class="doctor-filter__feedback" role="status">
+                <i class="bi bi-info-circle" aria-hidden="true"></i>
+                <span>تخصص انتخاب‌شده معتبر نیست؛ فیلتر تخصص اعمال نشد.</span>
+            </div>
+        {% endif %}
+
+        <div class="doctor-discovery__results-head">
+            <div>
+                <span class="section-eyebrow">نتایج</span>
+                <h2>پزشکان فعال</h2>
+            </div>
+            <span class="doctor-discovery__count">{{ result_count }} پزشک</span>
+        </div>
+
+        {% if doctor_cards %}
+            <div class="doctor-grid">
+                {% for card in doctor_cards %}
+                    <div data-reveal>
+                        {% include "components/doctor_card.html" with name=card.name specialty=card.specialty fee=card.fee initials=card.initials %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            {% url "doctors:list" as doctor_list_url %}
+            <div class="doctor-discovery__empty">
+                {% if has_filters %}
+                    {% include "components/empty_state.html" with icon="bi-search" title="پزشکی با این فیلترها پیدا نشد" description="عبارت جستجو یا تخصص انتخابی را تغییر دهید و دوباره امتحان کنید." action_url=doctor_list_url action_label="پاک کردن فیلترها" %}
+                {% else %}
+                    {% include "components/empty_state.html" with icon="bi-person-heart" title="هنوز پزشکی برای نمایش وجود ندارد" description="پس از اضافه شدن پزشکان فعال، آن‌ها در این بخش نمایش داده می‌شوند." %}
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
