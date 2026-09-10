@@ -66,6 +66,15 @@ def test_name_search_is_case_insensitive_and_partial(client, doctors):
 
 
 @pytest.mark.django_db
+def test_name_search_safely_handles_nul_bytes(client, doctors):
+    response = client.get(reverse("doctors:list"), {"q": "سارا\x00"})
+    html = response.content.decode("utf-8")
+
+    assert response.status_code == 200
+    assert doctors["sara"].full_name in html
+
+
+@pytest.mark.django_db
 def test_specialty_filter_returns_only_matching_active_doctors(client, doctors, specialties):
     response = client.get(
         reverse("doctors:list"),
@@ -151,6 +160,22 @@ def test_results_use_shared_doctor_card_contract(client, doctors):
     assert doctors["sara"].specialty.name in html
     assert "350,000" in html
     assert "تومان" in html
+
+
+@pytest.mark.django_db
+def test_fractional_visit_fee_is_displayed_without_rounding(client, specialties):
+    Doctor.objects.create(
+        full_name="پزشک اعشاری",
+        specialty=specialties["cardiology"],
+        visit_fee=Decimal("350000.50"),
+        is_active=True,
+    )
+
+    response = client.get(reverse("doctors:list"), {"q": "پزشک اعشاری"})
+    html = response.content.decode("utf-8")
+
+    assert response.status_code == 200
+    assert "350,000.50 تومان" in html
 
 
 @pytest.mark.django_db
