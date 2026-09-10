@@ -1,7 +1,12 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}پزشکان | نوبت پزشک{% endblock %}
 {% block meta_description %}جستجو و فیلتر پزشکان فعال بر اساس نام و تخصص{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/doctors.css' %}">
+{% endblock %}
 
 {% block content %}
 <section class="doctor-discovery">
