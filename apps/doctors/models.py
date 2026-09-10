@@ -66,10 +66,7 @@ class Doctor(models.Model):
                 condition=models.Q(visit_fee__gte=0),
                 name="doctor_visit_fee_gte_zero",
             ),
-            models.UniqueConstraint(
-                fields=["full_name", "specialty"],
-                name="unique_doctor_per_specialty",
-            ),
+            
         ]
 
     def __str__(self):
