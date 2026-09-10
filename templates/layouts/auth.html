@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="auth-shell">
+    <div class="container">
+        <div class="auth-shell__grid">
+            <div class="auth-card" data-reveal>
+                <div class="auth-card__header">
+                    <a class="auth-card__brand" href="{% url 'home' %}">
+                        <span class="app-brand__mark app-brand__mark--small">
+                            <i class="bi bi-heart-pulse-fill"></i>
+                        </span>
+                    </a>
+
+                    <span class="eyebrow">{% block auth_eyebrow %}حساب کاربری{% endblock %}</span>
+                    <h1>{% block auth_title %}ورود به حساب{% endblock %}</h1>
+                    <p>{% block auth_description %}اطلاعات حساب خود را وارد کنید.{% endblock %}</p>
+                </div>
+
+                <div class="auth-card__body">
+                    {% block auth_content %}{% endblock %}
+                </div>
+
+                <div class="auth-card__footer">
+                    {% block auth_footer %}{% endblock %}
+                </div>
+            </div>
+
+            <aside class="auth-aside d-none d-lg-flex" data-reveal>
+                <div class="auth-aside__content">
+                    <span class="eyebrow eyebrow--light">تجربه امن و ساده</span>
+                    <h2>همه چیز برای یک رزرو بدون اصطکاک</h2>
+                    <p>
+                        حساب کاربری شما مسیر نوبت‌ها، پرداخت‌ها و ارتباط با پزشک را
+                        در یک تجربه یکپارچه نگه می‌دارد.
+                    </p>
+
+                    <div class="auth-aside__points">
+                        <div><i class="bi bi-shield-check"></i><span>ورود امن</span></div>
+                        <div><i class="bi bi-calendar2-check"></i><span>مدیریت نوبت‌ها</span></div>
+                        <div><i class="bi bi-wallet2"></i><span>پرداخت یکپارچه</span></div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+</section>
+{% endblock %}

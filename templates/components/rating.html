@@ -1,0 +1,7 @@
+<div class="rating-inline" aria-label="امتیاز {{ rating|default:'بدون امتیاز' }}">
+    <span class="rating-inline__star"><i class="bi bi-star-fill"></i></span>
+    <strong>{{ rating|default:"—" }}</strong>
+    {% if reviews_count is not None %}
+        <span class="rating-inline__count">({{ reviews_count }} نظر)</span>
+    {% endif %}
+</div>
