@@ -1,8 +1,10 @@
 from decimal import Decimal
-from django.test import TestCase
+
 from django.db.models import ProtectedError
 from django.db.utils import IntegrityError
-from apps.doctors.models import Specialty, Doctor
+from django.test import TestCase
+
+from apps.doctors.models import Doctor, Specialty
 
 
 class SpecialtyModelTest(TestCase):
