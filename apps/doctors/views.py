@@ -4,7 +4,10 @@ from apps.doctors.models import Doctor, Specialty
 
 
 def _format_visit_fee(amount):
-    return f"{amount:,.0f} تومان"
+    formatted_amount = f"{amount:,.2f}"
+    if formatted_amount.endswith(".00"):
+        formatted_amount = formatted_amount[:-3]
+    return f"{formatted_amount} تومان"
 
 
 def _doctor_card_data(doctor):
@@ -17,7 +20,7 @@ def _doctor_card_data(doctor):
 
 
 def doctor_list_view(request):
-    query = request.GET.get("q", "").strip()
+    query = request.GET.get("q", "").replace("\x00", "").strip()
     raw_specialty = request.GET.get("specialty", "").strip()
 
     doctors = Doctor.objects.filter(is_active=True).select_related("specialty")
