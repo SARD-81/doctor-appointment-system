@@ -98,7 +98,8 @@ def test_combined_filters_can_return_empty_result(client, doctors, specialties):
     )
     html = response.content.decode("utf-8")
 
-    assert doctors["sara"].full_name not in html
+    assert response.status_code == 200
+    assert 'class="doctor-card"' not in html
     assert "پزشکی با این فیلترها پیدا نشد" in html
 
 
