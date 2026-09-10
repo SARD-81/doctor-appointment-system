@@ -45,17 +45,19 @@
         {% endif %}
     </div>
 
-    <div class="doctor-card__actions">
-        {% if profile_url %}
-            <a class="btn btn-ghost app-btn app-btn--sm" href="{{ profile_url }}">
-                مشاهده پروفایل
-            </a>
-        {% endif %}
+    {% if profile_url or booking_url %}
+        <div class="doctor-card__actions">
+            {% if profile_url %}
+                <a class="btn btn-ghost app-btn app-btn--sm" href="{{ profile_url }}">
+                    مشاهده پروفایل
+                </a>
+            {% endif %}
 
-        {% if booking_url %}
-            <a class="btn btn-primary app-btn app-btn--sm" href="{{ booking_url }}">
-                دریافت نوبت
-            </a>
-        {% endif %}
-    </div>
+            {% if booking_url %}
+                <a class="btn btn-primary app-btn app-btn--sm" href="{{ booking_url }}">
+                    دریافت نوبت
+                </a>
+            {% endif %}
+        </div>
+    {% endif %}
 </article>
