@@ -34,3 +34,7 @@ Thumbs.db
 documents/
 *.log
 *.sqlite3
+
+# Static & Media files
+staticfiles/
+media/
