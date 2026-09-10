@@ -30,6 +30,8 @@ DJANGO_APPS = [
 
 LOCAL_APPS = [
     "apps.accounts",
+    "apps.doctors",
+    "apps.appointments",
 ]
 
 THIRD_PARTY_APPS = []
