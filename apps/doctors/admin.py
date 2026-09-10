@@ -42,5 +42,3 @@ class DoctorAdmin(admin.ModelAdmin):
             },
         ),
     )
-
-

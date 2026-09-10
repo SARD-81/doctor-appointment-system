@@ -67,9 +67,7 @@ class Doctor(models.Model):
                 condition=models.Q(visit_fee__gte=0),
                 name="doctor_visit_fee_gte_zero",
             ),
-            
         ]
 
     def __str__(self):
         return f"Dr. {self.full_name} - {self.specialty.name}"
-
