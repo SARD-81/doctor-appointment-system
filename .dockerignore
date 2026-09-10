@@ -1,0 +1,40 @@
+# Version control
+.git
+.gitignore
+
+# Python cache & virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
+ENV/
+
+# Environment files & secrets
+.env
+.env.*
+*.env
+
+# Testing & linting artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+.ruff_cache/
+
+# IDE & OS files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Documentation & temporary builds
+documents/
+*.log
+*.sqlite3
+
+# Static & Media files
+staticfiles/
+media/
