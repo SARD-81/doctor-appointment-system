@@ -1,6 +1,6 @@
 from decimal import Decimal
 from django.test import TestCase
-from django.core.exceptions import ValidationError
+from django.db.models import ProtectedError
 from django.db.utils import IntegrityError
 from apps.doctors.models import Specialty, Doctor
 
@@ -25,7 +25,6 @@ class DoctorModelTest(TestCase):
             specialty=self.specialty,
             full_name="علی رضایی",
             visit_fee=Decimal("150000.00"),
-            is_active=True,
         )
         self.assertEqual(str(doctor), f"Dr. علی رضایی - {self.specialty.name}")
         self.assertTrue(doctor.is_active)
@@ -38,15 +37,18 @@ class DoctorModelTest(TestCase):
                 visit_fee=Decimal("-1000.00"),
             )
 
-    def test_unique_doctor_per_specialty_constraint(self):
+    def test_doctor_without_specialty_cannot_be_saved(self):
+        with self.assertRaises(IntegrityError):
+            Doctor.objects.create(
+                full_name="پزشک بدون تخصص",
+                visit_fee=Decimal("100000.00"),
+            )
+
+    def test_specialty_protected_when_doctor_exists(self):
         Doctor.objects.create(
             specialty=self.specialty,
             full_name="سارا احمدی",
             visit_fee=Decimal("200000.00"),
         )
-        with self.assertRaises(IntegrityError):
-            Doctor.objects.create(
-                specialty=self.specialty,
-                full_name="سارا احمدی",
-                visit_fee=Decimal("250000.00"),
-            )
+        with self.assertRaises(ProtectedError):
+            self.specialty.delete()
