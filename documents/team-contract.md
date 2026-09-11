@@ -61,7 +61,15 @@ The application path should not wait on Docker work unless a feature genuinely r
 9. Each developer is responsible for resolving conflicts introduced by their branch.
 10. Pull Requests must stay inside the assigned ownership/scope.
 11. Squash Merge is the default strategy for normal feature/chore Pull Requests.
-12. Green CI and Team Lead review are required before merge.
+12. Green CI and the applicable human-review rule below are required before merge.
+
+## Review Responsibility
+
+- Pull Requests authored by Mahsa or Amirreza require Team Lead review before merge.
+- Pull Requests authored by the Team Lead should be reviewed by at least one other teammate when practical; this peer review does **not** transfer implementation ownership.
+- For high-risk application changes—financial ledger/Wallet, atomic BookingService, migrations that change cross-domain contracts, or security-sensitive behavior—Team Lead-authored PRs should receive peer review before merge even under the accelerated delivery plan.
+- Automated review is useful but does not replace the human-review rule above.
+- The Team Lead owns final integration and merge decisions.
 
 ## Definition of Ready for Review
 
