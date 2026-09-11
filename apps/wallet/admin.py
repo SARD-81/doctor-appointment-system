@@ -1,9 +1,11 @@
 from django.contrib import admin
+
 from apps.wallet.models import Wallet, WalletTransaction
 
 
 class WalletTransactionInline(admin.TabularInline):
     model = WalletTransaction
+    fk_name = "wallet"
     extra = 0
     can_delete = False
     readonly_fields = ("transaction_type", "amount", "created_at")

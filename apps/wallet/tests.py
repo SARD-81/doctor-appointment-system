@@ -1,4 +1,3 @@
-import time
 from datetime import timedelta
 from decimal import Decimal
 
@@ -8,14 +7,14 @@ from django.db import IntegrityError, transaction
 from django.test import TestCase
 from django.utils import timezone
 
+from apps.appointments.models import Appointment, AppointmentSlot
+from apps.doctors.models import Doctor
 from apps.wallet.models import Wallet, WalletTransaction
 
 User = get_user_model()
 
 
 class WalletModelTest(TestCase):
-    """تست‌های واحد مدل Wallet"""
-
     def setUp(self):
         self.user = User.objects.create_user(
             username="wallet_user_1",
@@ -56,8 +55,6 @@ class WalletModelTest(TestCase):
 
 
 class WalletTransactionModelTest(TestCase):
-    """تست‌های واحد مدل WalletTransaction"""
-
     def setUp(self):
         self.user = User.objects.create_user(
             username="tx_user_1",
@@ -106,7 +103,6 @@ class WalletTransactionModelTest(TestCase):
             transaction_type=WalletTransaction.TransactionType.WITHDRAW,
         )
 
-        # ست کردن زمان برای تضمین ترتیب در دیتابیس تست
         WalletTransaction.objects.filter(pk=tx1.pk).update(
             created_at=timezone.now() - timedelta(minutes=10)
         )
@@ -126,3 +122,75 @@ class WalletTransactionModelTest(TestCase):
         tx_id = tx.pk
         self.wallet.delete()
         self.assertFalse(WalletTransaction.objects.filter(pk=tx_id).exists())
+
+    def test_create_transaction_linked_to_appointment(self):
+        doctor_user = User.objects.create_user(
+            username="doc_user_1",
+            email="doc_user_1@example.com",
+            password="testpass123",
+        )
+        doctor = Doctor.objects.create(
+            user=doctor_user,
+            specialty="Cardiology",
+        )
+        slot = AppointmentSlot.objects.create(
+            doctor=doctor,
+            starts_at=timezone.now() + timedelta(days=1),
+        )
+        appointment = Appointment.objects.create(
+            patient=self.user,
+            slot=slot,
+            amount_paid=Decimal("50000.00"),
+        )
+
+        tx = WalletTransaction.objects.create(
+            wallet=self.wallet,
+            appointment=appointment,
+            amount=Decimal("50000.00"),
+            transaction_type=WalletTransaction.TransactionType.WITHDRAW,
+        )
+
+        self.assertEqual(tx.appointment, appointment)
+        self.assertIn(tx, appointment.wallet_transactions.all())
+
+    def test_transaction_appointment_is_optional(self):
+        tx = WalletTransaction.objects.create(
+            wallet=self.wallet,
+            amount=Decimal("15000.00"),
+            transaction_type=WalletTransaction.TransactionType.DEPOSIT,
+        )
+        self.assertIsNone(tx.appointment)
+
+    def test_deleting_appointment_sets_transaction_appointment_to_null(self):
+        doctor_user = User.objects.create_user(
+            username="doc_user_2",
+            email="doc_user_2@example.com",
+            password="testpass123",
+        )
+        doctor = Doctor.objects.create(
+            user=doctor_user,
+            specialty="Dermatology",
+        )
+        slot = AppointmentSlot.objects.create(
+            doctor=doctor,
+            starts_at=timezone.now() + timedelta(days=2),
+        )
+        appointment = Appointment.objects.create(
+            patient=self.user,
+            slot=slot,
+            amount_paid=Decimal("30000.00"),
+        )
+
+        tx = WalletTransaction.objects.create(
+            wallet=self.wallet,
+            appointment=appointment,
+            amount=Decimal("30000.00"),
+            transaction_type=WalletTransaction.TransactionType.WITHDRAW,
+        )
+        tx_id = tx.pk
+
+        appointment.delete()
+
+        tx.refresh_from_db()
+        self.assertTrue(WalletTransaction.objects.filter(pk=tx_id).exists())
+        self.assertIsNone(tx.appointment)
