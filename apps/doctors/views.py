@@ -1,5 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
+from django.urls import reverse
 
+from apps.appointments.selectors import available_slots_for_doctor
 from apps.doctors.models import Doctor, Specialty
 
 
@@ -16,6 +18,7 @@ def _doctor_card_data(doctor):
         "specialty": doctor.specialty.name,
         "fee": _format_visit_fee(doctor.visit_fee),
         "initials": doctor.full_name[:1] or "د",
+        "profile_url": reverse("doctors:detail", args=[doctor.pk]),
     }
 
 
@@ -59,5 +62,43 @@ def doctor_list_view(request):
             "specialty_filter_invalid": specialty_filter_invalid,
             "has_filters": bool(query or raw_specialty),
             "result_count": len(doctor_cards),
+        },
+    )
+
+
+def doctor_detail_view(request, doctor_id):
+    doctor = get_object_or_404(
+        Doctor.objects.select_related("specialty"),
+        pk=doctor_id,
+        is_active=True,
+    )
+    available_slots = available_slots_for_doctor(doctor)
+
+    selected_slot = None
+    selected_slot_invalid = False
+    raw_slot = request.GET.get("slot", "").strip()
+
+    if raw_slot:
+        try:
+            slot_id = int(raw_slot)
+        except (TypeError, ValueError):
+            selected_slot_invalid = True
+        else:
+            selected_slot = available_slots.filter(pk=slot_id).first()
+            if selected_slot is None:
+                selected_slot_invalid = True
+
+    slots = list(available_slots)
+
+    return render(
+        request,
+        "doctors/doctor_detail.html",
+        {
+            "doctor": doctor,
+            "visit_fee": _format_visit_fee(doctor.visit_fee),
+            "slots": slots,
+            "selected_slot": selected_slot,
+            "selected_slot_id": selected_slot.pk if selected_slot else None,
+            "selected_slot_invalid": selected_slot_invalid,
         },
     )
