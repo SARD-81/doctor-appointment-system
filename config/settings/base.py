@@ -28,8 +28,11 @@ DJANGO_APPS = [
     "django.contrib.staticfiles",
 ]
 
-LOCAL_APPS = ["apps.accounts", "apps.appointments", "apps.doctors", "apps.wallet"]
-
+LOCAL_APPS = [
+    "apps.accounts",
+    "apps.doctors",
+    "apps.wallet",
+]
 THIRD_PARTY_APPS = []
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
