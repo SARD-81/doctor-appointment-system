@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
 
@@ -33,13 +34,13 @@ class Wallet(models.Model):
         ]
 
     def __str__(self):
-        return f"کیف پول {self.user} ({self.balance})"
+        return f"Wallet for {self.user} ({self.balance})"
 
 
 class WalletTransaction(models.Model):
     class TransactionType(models.TextChoices):
-        DEPOSIT = "DEPOSIT", "Deposit"
-        WITHDRAW = "WITHDRAW", "Withdraw"
+        TOP_UP = "TOP_UP", "Top Up"
+        APPOINTMENT_PAYMENT = "APPOINTMENT_PAYMENT", "Appointment Payment"
 
     wallet = models.ForeignKey(
         Wallet,
@@ -47,7 +48,7 @@ class WalletTransaction(models.Model):
         related_name="transactions",
         verbose_name="Wallet",
     )
-    # Added optional link to Appointment for payment tracing and audit trail.
+    # Optional link to Appointment for payment tracing and audit trail.
     # Uses lazy reference 'appointments.Appointment' to prevent circular dependencies.
     # Set to null on delete to preserve financial transaction history
     # even if the appointment is removed.
@@ -66,7 +67,7 @@ class WalletTransaction(models.Model):
         verbose_name="Amount",
     )
     transaction_type = models.CharField(
-        max_length=10,
+        max_length=25,
         choices=TransactionType.choices,
         verbose_name="Transaction Type",
     )
@@ -76,13 +77,42 @@ class WalletTransaction(models.Model):
         verbose_name = "Wallet Transaction"
         verbose_name_plural = "Wallet Transactions"
         ordering = ["-created_at"]
-        # Added indexes:
-        # 1. (wallet, created_at) to optimize user transaction history listings.
-        # 2. (appointment) to optimize lookups for payment reconciliation per appointment.
         indexes = [
             models.Index(fields=["wallet", "created_at"]),
             models.Index(fields=["appointment"]),
         ]
+        # Enforces the payment-trace contract at the DB level as well:
+        # TOP_UP must never carry an appointment reference, and
+        # APPOINTMENT_PAYMENT must always carry one.
+        constraints = [
+            models.CheckConstraint(
+                condition=(
+                    models.Q(
+                        transaction_type="TOP_UP",
+                        appointment__isnull=True,
+                    )
+                    | models.Q(
+                        transaction_type="APPOINTMENT_PAYMENT",
+                        appointment__isnull=False,
+                    )
+                ),
+                name="wallet_transaction_appointment_rule",
+            ),
+        ]
+
+    def clean(self):
+        super().clean()
+        if self.transaction_type == self.TransactionType.TOP_UP and self.appointment_id:
+            raise ValidationError(
+                {"appointment": "TOP_UP transactions not linked to an Appointment."}
+            )
+        if (
+            self.transaction_type == self.TransactionType.APPOINTMENT_PAYMENT
+            and not self.appointment_id
+        ):
+            raise ValidationError(
+                {"appointment": "APPOINTMENT_PAYMENT transactions linked to an Appointment."}
+            )
 
     def __str__(self):
         return f"{self.transaction_type} - {self.amount} ({self.wallet.user})"
