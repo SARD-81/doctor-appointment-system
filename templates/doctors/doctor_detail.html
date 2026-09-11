@@ -82,7 +82,11 @@
                             <legend class="visually-hidden">انتخاب زمان نوبت</legend>
                             <div class="doctor-slot-grid">
                                 {% for slot in slots %}
-                                    {% include "components/slot_chip.html" with name="slot" value=slot.pk label=slot.starts_at|date:"Y/m/d - H:i" selected=selected_slot_id == slot.pk %}
+                                    {% if selected_slot_id == slot.pk %}
+                                        {% include "components/slot_chip.html" with name="slot" value=slot.pk label=slot.starts_at|date:"Y/m/d - H:i" selected=True %}
+                                    {% else %}
+                                        {% include "components/slot_chip.html" with name="slot" value=slot.pk label=slot.starts_at|date:"Y/m/d - H:i" %}
+                                    {% endif %}
                                 {% endfor %}
                             </div>
                         </fieldset>
