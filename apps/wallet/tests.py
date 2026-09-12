@@ -9,9 +9,17 @@ from .services import WalletService
 User = get_user_model()
 
 
+def create_user(username):
+    return User.objects.create_user(
+        username=username,
+        email=f"{username}@example.com",
+        password="pass12345",
+    )
+
+
 @pytest.mark.django_db
 def test_top_up_creates_wallet_transaction():
-    user = User.objects.create_user(email="wallet@example.com", password="pass12345")
+    user = create_user("wallet")
 
     wallet = WalletService.top_up(user=user, amount=Decimal("100"))
 
@@ -22,7 +30,7 @@ def test_top_up_creates_wallet_transaction():
 
 @pytest.mark.django_db
 def test_top_up_rejects_non_positive_amount():
-    user = User.objects.create_user(email="wallet2@example.com", password="pass12345")
+    user = create_user("wallet2")
 
     with pytest.raises(ValueError):
         WalletService.top_up(user=user, amount=Decimal("0"))
