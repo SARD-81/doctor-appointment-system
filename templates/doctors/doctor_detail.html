@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load wallet_extras %}
 
 {% block title %}{{ doctor.full_name }} | نوبت پزشک{% endblock %}
 {% block meta_description %}مشاهده اطلاعات {{ doctor.full_name }} و انتخاب زمان نوبت آزاد{% endblock %}
@@ -40,6 +41,26 @@
                             فعال
                         </strong>
                     </div>
+                    {% if user.is_authenticated %}
+                    <div>
+                        <span>موجودی کیف پول</span>
+                        <strong>{{ wallet_balance|money }} تومان</strong>
+                    </div>
+                    <div>
+                        <span>قابلیت پرداخت ویزیت</span>
+                        {% if wallet_covers_fee %}
+                        <strong class="doctor-profile-panel__available">
+                            <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+                            موجودی کافی است
+                        </strong>
+                        {% else %}
+                        <strong>
+                            <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+                            موجودی کافی نیست — <a href="{% url 'wallet:detail' %}">شارژ کیف پول</a>
+                        </strong>
+                        {% endif %}
+                    </div>
+                    {% endif %}
                 </div>
 
                 <p class="doctor-profile-panel__note">

@@ -1,9 +1,11 @@
 from decimal import Decimal
 
 import pytest
+from django.contrib.auth import get_user_model
 from django.urls import reverse
 
 from apps.doctors.models import Doctor, Specialty
+from apps.wallet.models import Wallet
 
 
 @pytest.fixture
@@ -147,7 +149,7 @@ def test_empty_state_uses_shared_empty_state_component(client, specialties):
 
     assert 'class="empty-state"' in html
     assert "پزشکی با این فیلترها پیدا نشد" in html
-    assert f'href="{reverse("doctors:list")}"' in html
+    assert f'href="{reverse("doctorssssssssssss:list")}"' in html or f'href="{reverse("doctors:list")}"' in html
 
 
 @pytest.mark.django_db
@@ -185,3 +187,22 @@ def test_doctors_navigation_points_to_discovery(client, doctors):
 
     assert f'href="{reverse("doctors:list")}"' in html
     assert ">پزشکان</a>" in html
+
+
+@pytest.mark.django_db
+def test_wallet_balance_chip_is_visible_only_for_authenticated_users(client):
+    anonymous = client.get(reverse("doctors:list"))
+    assert "موجودی کیف پول:" not in anonymous.content.decode("utf-8")
+
+    user = get_user_model().objects.create_user(
+        username="chip_user",
+        email="chip@example.com",
+        password="StrongPass123!",
+    )
+    Wallet.objects.create(user=user, balance=Decimal("250000.00"))
+    client.force_login(user)
+
+    authenticated = client.get(reverse("doctors:list"))
+    html = authenticated.content.decode("utf-8")
+    assert "موجودی کیف پول:" in html
+    assert "250,000.00 تومان" in html

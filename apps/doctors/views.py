@@ -1,8 +1,12 @@
+from decimal import Decimal
+
+from django.contrib import messages
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 
 from apps.appointments.selectors import available_slots_for_doctor
 from apps.doctors.models import Doctor, Specialty
+from apps.wallet.models import Wallet
 
 
 def _format_visit_fee(amount):
@@ -10,6 +14,13 @@ def _format_visit_fee(amount):
     if formatted_amount.endswith(".00"):
         formatted_amount = formatted_amount[:-3]
     return f"{formatted_amount} تومان"
+
+
+def _current_wallet_balance(request):
+    if not request.user.is_authenticated:
+        return None
+    wallet = Wallet.objects.filter(user=request.user).only("balance").first()
+    return wallet.balance if wallet else Decimal("0.00")
 
 
 def _doctor_card_data(doctor):
@@ -62,6 +73,7 @@ def doctor_list_view(request):
             "specialty_filter_invalid": specialty_filter_invalid,
             "has_filters": bool(query or raw_specialty),
             "result_count": len(doctor_cards),
+            "wallet_balance": _current_wallet_balance(request),
         },
     )
 
@@ -77,6 +89,7 @@ def doctor_detail_view(request, doctor_id):
     selected_slot = None
     selected_slot_invalid = False
     raw_slot = request.GET.get("slot", "").strip()
+    session_key = f"confirmed_slot_{doctor.pk}"
 
     if raw_slot:
         try:
@@ -87,7 +100,16 @@ def doctor_detail_view(request, doctor_id):
             selected_slot = available_slots.filter(pk=slot_id).first()
             if selected_slot is None:
                 selected_slot_invalid = True
+            else:
+                if request.session.get(session_key) == selected_slot.pk:
+                    messages.info(
+                        request,
+                        "این زمان قبلاً به‌عنوان انتخاب شما ثبت شده است.",
+                    )
+                else:
+                    request.session[session_key] = selected_slot.pk
 
+    wallet_balance = _current_wallet_balance(request)
     slots = list(available_slots)
 
     return render(
@@ -100,5 +122,9 @@ def doctor_detail_view(request, doctor_id):
             "selected_slot": selected_slot,
             "selected_slot_id": selected_slot.pk if selected_slot else None,
             "selected_slot_invalid": selected_slot_invalid,
+            "wallet_balance": wallet_balance,
+            "wallet_covers_fee": (
+                wallet_balance is not None and wallet_balance >= doctor.visit_fee
+            ),
         },
     )

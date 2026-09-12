@@ -8,6 +8,7 @@ from django.utils import timezone
 
 from apps.appointments.models import Appointment, AppointmentSlot, AppointmentStatus
 from apps.doctors.models import Doctor, Specialty
+from apps.wallet.models import Wallet
 
 
 @pytest.fixture
@@ -183,3 +184,39 @@ def test_discovery_cards_link_to_doctor_detail(client, doctor):
 
     assert f'href="{reverse("doctors:detail", args=[doctor.pk])}"' in html
     assert "مشاهده پروفایل" in html
+
+
+@pytest.mark.django_db
+def test_detail_shows_wallet_balance_state_for_authenticated_user(client, doctor, patient):
+    client.force_login(patient)
+    Wallet.objects.create(user=patient, balance=Decimal("150000.00"))
+
+    response = client.get(reverse("doctors:detail", args=[doctor.pk]))
+    html = response.content.decode("utf-8")
+
+    assert "موجودی کیف پول" in html
+    assert "150,000.00 تومان" in html
+    assert "موجودی کافی نیست" in html
+
+
+@pytest.mark.django_db
+def test_detail_hides_wallet_state_for_anonymous_user(client, doctor):
+    response = client.get(reverse("doctors:detail", args=[doctor.pk]))
+
+    assert "موجودی کیف پول" not in response.content.decode("utf-8")
+
+
+@pytest.mark.django_db
+def test_reconfirming_already_selected_slot_surfaces_notice(client, doctor, patient):
+    slot = AppointmentSlot.objects.create(
+        doctor=doctor,
+        starts_at=timezone.now() + timedelta(days=1),
+        is_active=True,
+    )
+    client.force_login(patient)
+
+    first = client.get(reverse("doctors:detail", args=[doctor.pk]), {"slot": slot.pk})
+    assert "قبلاً به‌عنوان انتخاب" not in first.content.decode("utf-8")
+
+    second = client.get(reverse("doctors:detail", args=[doctor.pk]), {"slot": slot.pk})
+    assert "قبلاً به‌عنوان انتخاب" in second.content.decode("utf-8")

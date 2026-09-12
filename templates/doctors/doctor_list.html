@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load wallet_extras %}
 
 {% block title %}پزشکان | نوبت پزشک{% endblock %}
 {% block meta_description %}جستجو و فیلتر پزشکان فعال بر اساس نام و تخصص{% endblock %}
@@ -17,6 +18,12 @@
             <p>
                 نام پزشک یا تخصص موردنظر را انتخاب کنید تا سریع‌تر به گزینه مناسب برسید.
             </p>
+            {% if user.is_authenticated %}
+            <a class="btn btn-ghost app-btn app-btn--sm" href="{% url 'wallet:detail' %}">
+                <i class="bi bi-wallet2" aria-hidden="true"></i>
+                موجودی کیف پول: {{ wallet_balance|money }} تومان
+            </a>
+            {% endif %}
         </header>
 
         <form class="doctor-filter" method="get" action="{% url 'doctors:list' %}" role="search" data-reveal>
@@ -40,8 +47,10 @@
                 <label for="doctor-specialty">تخصص</label>
                 <select id="doctor-specialty" class="app-input" name="specialty">
                     <option value="">همه تخصص‌ها</option>
+                    
                     {% for specialty in specialties %}
                         <option value="{{ specialty.pk }}" {% if selected_specialty_id == specialty.pk %}selected{% endif %}>
+
                             {{ specialty.name }}
                         </option>
                     {% endfor %}
