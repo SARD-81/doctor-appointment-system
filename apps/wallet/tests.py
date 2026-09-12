@@ -3,7 +3,7 @@ from decimal import Decimal
 import pytest
 from django.contrib.auth import get_user_model
 
-from .models import Wallet, WalletTransaction
+from .models import WalletTransaction
 from .services import WalletService
 
 User = get_user_model()
@@ -26,3 +26,8 @@ def test_top_up_rejects_non_positive_amount():
 
     with pytest.raises(ValueError):
         WalletService.top_up(user=user, amount=Decimal("0"))
+
+
+def test_top_up_requires_decimal_amount():
+    with pytest.raises(TypeError):
+        WalletService.top_up(user=None, amount=100)
