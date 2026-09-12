@@ -74,6 +74,14 @@
                             <span>{{ selected_slot.starts_at|date:"Y/m/d - H:i" }}</span>
                         </div>
                     </div>
+
+                    <form class="doctor-slot-form__actions" method="post" action="{% url 'appointments:book' selected_slot.pk %}" data-booking-form>
+                        {% csrf_token %}
+                        <button class="btn btn-primary app-btn" type="submit">
+                            <i class="bi bi-wallet2" aria-hidden="true"></i>
+                            رزرو و پرداخت {{ visit_fee }}
+                        </button>
+                    </form>
                 {% endif %}
 
                 {% if slots %}

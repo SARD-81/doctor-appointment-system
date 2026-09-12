@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}تأیید رزرو نوبت | نوبت پزشک{% endblock %}
+{% block meta_description %}نوبت شما با موفقیت ثبت شد{% endblock %}
+
+{% block content %}
+<section class="doctor-detail">
+    <div class="container">
+        <main class="doctor-slots-panel">
+            <header class="doctor-slots-panel__header">
+                <div>
+                    <span class="section-eyebrow">تأیید رزرو</span>
+                    <h1>نوبت شما با موفقیت ثبت شد</h1>
+                </div>
+            </header>
+
+            <div class="doctor-slot-feedback doctor-slot-feedback--success" role="status">
+                <i class="bi bi-check-circle" aria-hidden="true"></i>
+                <div>
+                    <strong>{{ appointment.slot.doctor.full_name }}</strong>
+                    <span>{{ appointment.slot.starts_at|date:"Y/m/d - H:i" }}</span>
+                    <span>کد پیگیری: {{ appointment.pk }}</span>
+                    <span>مبلغ پرداخت‌شده از کیف پول: {{ appointment.amount_paid }} تومان</span>
+                </div>
+            </div>
+
+            <div class="doctor-slot-form__actions">
+                <a class="btn btn-primary app-btn" href="{% url 'doctors:list' %}">
+                    بازگشت به پزشکان
+                </a>
+                <a class="btn btn-ghost app-btn" href="{% url 'wallet:detail' %}">
+                    مشاهده کیف پول
+                </a>
+            </div>
+        </main>
+    </div>
+</section>
+{% endblock %}
