@@ -149,7 +149,7 @@ def test_empty_state_uses_shared_empty_state_component(client, specialties):
 
     assert 'class="empty-state"' in html
     assert "پزشکی با این فیلترها پیدا نشد" in html
-    assert f'href="{reverse("doctorssssssssssss:list")}"' in html or f'href="{reverse("doctors:list")}"' in html
+    assert f'href="{reverse("doctors:list")}"' in html
 
 
 @pytest.mark.django_db
