@@ -1,20 +1,90 @@
 {% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}کیف پول{% endblock %}
 
 {% block content %}
-<h1>کیف پول</h1>
-<p>موجودی: {{ wallet.balance }}</p>
-<form method="post">
-  {% csrf_token %}
-  <input type="number" step="0.01" name="amount" placeholder="مبلغ افزایش موجودی">
-  <button type="submit">افزایش موجودی</button>
-</form>
+<section class="section-space section-space--soft">
+  <div class="container">
+    <div class="section-heading" data-reveal>
+      <span class="eyebrow">
+        <i class="bi bi-wallet2" aria-hidden="true"></i>
+        حساب مالی
+      </span>
+      <h1>کیف پول</h1>
+      <p>موجودی فعلی: {{ wallet.balance|intcomma }} تومان</p>
+    </div>
 
-<h2>تراکنش‌ها</h2>
-<ul>
-{% for transaction in wallet.transactions.all %}
-<li>{{ transaction.transaction_type }} - {{ transaction.amount }}</li>
-{% empty %}
-<li>تراکنشی وجود ندارد.</li>
-{% endfor %}
-</ul>
+    <div class="row g-4">
+      <div class="col-lg-5">
+        <div class="step-card h-100" data-reveal>
+          <div class="step-card__icon">
+            <i class="bi bi-plus-circle" aria-hidden="true"></i>
+          </div>
+          <h3>افزایش موجودی</h3>
+          <p>مبلغ موردنظر را وارد کنید تا به‌صورت شبیه‌سازی‌شده به کیف پول شما اضافه شود.</p>
+          <form method="post" class="app-form" novalidate>
+            {% csrf_token %}
+            <input
+              type="number"
+              name="amount"
+              step="0.01"
+              min="0.01"
+              placeholder="مبلغ افزایش موجودی"
+              aria-label="مبلغ افزایش موجودی"
+              required
+            >
+            <button type="submit" class="btn btn-primary app-btn w-100">
+              <i class="bi bi-wallet2" aria-hidden="true"></i>
+              افزایش موجودی
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div class="col-lg-7">
+        <div class="step-card h-100" data-reveal>
+          <div class="step-card__icon">
+            <i class="bi bi-receipt" aria-hidden="true"></i>
+          </div>
+          <h3>تراکنش‌ها</h3>
+          {% with transactions=wallet.transactions.all %}
+            {% if transactions %}
+              <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                  <thead>
+                    <tr>
+                      <th scope="col">نوع</th>
+                      <th scope="col">مبلغ</th>
+                      <th scope="col">موجودی پس از تراکنش</th>
+                      <th scope="col">زمان</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for transaction in transactions %}
+                      <tr>
+                        <td>
+                          {% if transaction.transaction_type == "TOP_UP" %}
+                            {% include "components/statusbadge.html" with tone="success" icon="bi-plus-circle" label=transaction.get_transaction_type_display %}
+                          {% else %}
+                            {% include "components/statusbadge.html" with tone="info" icon="bi-calendar2-check" label=transaction.get_transaction_type_display %}
+                          {% endif %}
+                        </td>
+                        <td>{{ transaction.amount|intcomma }}</td>
+                        <td>{{ transaction.balance_after|intcomma }}</td>
+                        <td>{{ transaction.created_at|date:"Y/m/d H:i" }}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            {% else %}
+              {% include "components/emptystate.html" with icon="bi-receipt" title="تراکنشی وجود ندارد." description="اولین شارژ کیف پول را انجام دهید تا اینجا ثبت شود." %}
+            {% endif %}
+          {% endwith %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 {% endblock %}
