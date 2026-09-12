@@ -61,14 +61,14 @@ def test_top_up_rejects_amount_above_per_transaction_limit():
 @pytest.mark.django_db
 def test_top_up_rejects_result_above_max_allowed_balance():
     user = create_user("wallet-balance-limit")
-    wallet = WalletService.top_up(user=user, amount=MAX_ALLOWED_BALANCE)
+    wallet = Wallet.objects.create(user=user, balance=MAX_ALLOWED_BALANCE)
 
     with pytest.raises(ValueError):
         WalletService.top_up(user=user, amount=Decimal("0.01"))
 
     wallet.refresh_from_db()
     assert wallet.balance == MAX_ALLOWED_BALANCE
-    assert wallet.transactions.count() == 1
+    assert wallet.transactions.count() == 0
 
 
 @pytest.mark.django_db
