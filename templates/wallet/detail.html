@@ -25,15 +25,14 @@
           <p>مبلغ موردنظر را وارد کنید تا به‌صورت شبیه‌سازی‌شده به کیف پول شما اضافه شود.</p>
           <form method="post" class="app-form" novalidate>
             {% csrf_token %}
-            <input
-              type="number"
-              name="amount"
-              step="0.01"
-              min="0.01"
-              placeholder="مبلغ افزایش موجودی"
-              aria-label="مبلغ افزایش موجودی"
-              required
-            >
+            {% if amount_form.non_field_errors %}
+              <div class="app-form__errors" role="alert">
+                {% for error in amount_form.non_field_errors %}
+                  <span><i class="bi bi-exclamation-circle" aria-hidden="true"></i> {{ error }}</span>
+                {% endfor %}
+              </div>
+            {% endif %}
+            {% include "components/form_field.html" with field=amount_form.amount %}
             <button type="submit" class="btn btn-primary app-btn w-100">
               <i class="bi bi-wallet2" aria-hidden="true"></i>
               افزایش موجودی
