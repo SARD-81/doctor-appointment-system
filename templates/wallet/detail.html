@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load humanize %}
+{% load wallet_extras %}
 
 {% block title %}کیف پول{% endblock %}
 
@@ -12,7 +12,7 @@
         حساب مالی
       </span>
       <h1>کیف پول</h1>
-      <p>موجودی فعلی: {{ wallet.balance|intcomma }} تومان</p>
+      <p>موجودی فعلی: {{ wallet.balance|money }} تومان</p>
     </div>
 
     <div class="row g-4">
@@ -70,8 +70,8 @@
                             {% include "components/statusbadge.html" with tone="info" icon="bi-calendar2-check" label=transaction.get_transaction_type_display %}
                           {% endif %}
                         </td>
-                        <td>{{ transaction.amount|intcomma }}</td>
-                        <td>{{ transaction.balance_after|intcomma }}</td>
+                        <td>{{ transaction.amount|money }}</td>
+                        <td>{{ transaction.balance_after|money }}</td>
                         <td>{{ transaction.created_at|date:"Y/m/d H:i" }}</td>
                       </tr>
                     {% endfor %}
