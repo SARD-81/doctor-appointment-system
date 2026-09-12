@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>کیف پول</h1>
+<p>موجودی: {{ wallet.balance }}</p>
+<form method="post">
+  {% csrf_token %}
+  <input type="number" step="0.01" name="amount" placeholder="مبلغ افزایش موجودی">
+  <button type="submit">افزایش موجودی</button>
+</form>
+
+<h2>تراکنش‌ها</h2>
+<ul>
+{% for transaction in wallet.transactions.all %}
+<li>{{ transaction.transaction_type }} - {{ transaction.amount }}</li>
+{% empty %}
+<li>تراکنشی وجود ندارد.</li>
+{% endfor %}
+</ul>
+{% endblock %}
