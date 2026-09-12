@@ -9,6 +9,9 @@ class WalletService:
     @staticmethod
     @transaction.atomic
     def top_up(*, user, amount: Decimal):
+        if not isinstance(amount, Decimal):
+            raise TypeError("Amount must be Decimal")
+
         if amount <= 0:
             raise ValueError("Amount must be positive")
 
