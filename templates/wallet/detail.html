@@ -65,9 +65,9 @@
                       <tr>
                         <td>
                           {% if transaction.transaction_type == "TOP_UP" %}
-                            {% include "components/statusbadge.html" with tone="success" icon="bi-plus-circle" label=transaction.get_transaction_type_display %}
+                            {% include "components/status_badge.html" with tone="success" icon="bi-plus-circle" label=transaction.get_transaction_type_display %}
                           {% else %}
-                            {% include "components/statusbadge.html" with tone="info" icon="bi-calendar2-check" label=transaction.get_transaction_type_display %}
+                            {% include "components/status_badge.html" with tone="info" icon="bi-calendar2-check" label=transaction.get_transaction_type_display %}
                           {% endif %}
                         </td>
                         <td>{{ transaction.amount|money }}</td>
@@ -79,7 +79,7 @@
                 </table>
               </div>
             {% else %}
-              {% include "components/emptystate.html" with icon="bi-receipt" title="تراکنشی وجود ندارد." description="اولین شارژ کیف پول را انجام دهید تا اینجا ثبت شود." %}
+              {% include "components/empty_state.html" with icon="bi-receipt" title="تراکنشی وجود ندارد." description="اولین شارژ کیف پول را انجام دهید تا اینجا ثبت شود." %}
             {% endif %}
           {% endwith %}
         </div>
