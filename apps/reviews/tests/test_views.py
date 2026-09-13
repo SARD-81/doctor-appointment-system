@@ -1,6 +1,5 @@
 import pytest
 from django.urls import reverse
-from pytest_django.asserts import assertMessages
 
 from apps.reviews.models import Review
 from apps.reviews.services import ReviewService
@@ -21,9 +20,7 @@ class TestCreateReviewView:
         response = client.get(self.url(completed_appointment))
         assert response.status_code == 405
 
-    def test_owner_can_submit_review(
-        self, client, completed_appointment, patient
-    ):
+    def test_owner_can_submit_review(self, client, completed_appointment, patient):
         client.force_login(patient)
         response = client.post(
             self.url(completed_appointment),
@@ -56,9 +53,7 @@ class TestCreateReviewView:
         assert any("تکمیل" in str(m) for m in messages)
         assert Review.objects.count() == 0
 
-    def test_duplicate_review_redirects_with_error(
-        self, client, completed_appointment, patient
-    ):
+    def test_duplicate_review_redirects_with_error(self, client, completed_appointment, patient):
         ReviewService.create_review(
             patient=patient,
             appointment_id=completed_appointment.pk,
@@ -76,9 +71,7 @@ class TestCreateReviewView:
         assert any("قبلا" in str(m) for m in messages)
         assert Review.objects.count() == 1
 
-    def test_invalid_rating_redirects_with_error(
-        self, client, completed_appointment, patient
-    ):
+    def test_invalid_rating_redirects_with_error(self, client, completed_appointment, patient):
         client.force_login(patient)
         response = client.post(
             self.url(completed_appointment), {"rating": "9"}, follow=True

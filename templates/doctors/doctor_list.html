@@ -80,7 +80,7 @@
             <div class="doctor-grid">
                 {% for card in doctor_cards %}
                     <div data-reveal>
-                        {% include "components/doctor_card.html" with name=card.name specialty=card.specialty fee=card.fee initials=card.initials profile_url=card.profile_url %}
+                        {% include "components/doctor_card.html" with name=card.name specialty=card.specialty fee=card.fee initials=card.initials profile_url=card.profile_url rating=card.rating reviews_count=card.reviews_count %}
                     </div>
                 {% endfor %}
             </div>

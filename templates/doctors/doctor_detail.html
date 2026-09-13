@@ -35,6 +35,16 @@
                         <strong>{{ visit_fee }}</strong>
                     </div>
                     <div>
+                        <span>میانگین امتیاز</span>
+                        <strong>
+                            {% if average_rating %}
+                                {{ average_rating }} از ۵ ({{ review_count }} نظر)
+                            {% else %}
+                                هنوز نظری ثبت نشده است
+                            {% endif %}
+                        </strong>
+                    </div>
+                    <div>
                         <span>وضعیت پذیرش</span>
                         <strong class="doctor-profile-panel__available">
                             <i class="bi bi-check-circle-fill" aria-hidden="true"></i>

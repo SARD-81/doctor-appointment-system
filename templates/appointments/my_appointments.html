@@ -58,10 +58,59 @@
                         </div>
 
                         {% if appointment.status == 'COMPLETED' %}
-                            <p class="my-appointment-card__note">
-                                <i class="bi bi-star" aria-hidden="true"></i>
-                                این ویزیت تکمیل شده است؛ امکان ثبت نظر و امتیاز در مرحلهٔ بعد فعال می‌شود.
-                            </p>
+                            {% if appointment.review %}
+                                <p class="my-appointment-card__note">
+                                    <i class="bi bi-star-fill" aria-hidden="true"></i>
+                                    امتیاز شما: {{ appointment.review.rating }} از ۵
+                                    {% if appointment.review.comment %} — «{{ appointment.review.comment }}»{% endif %}
+                                </p>
+                            {% else %}
+                                <form
+                                    class="my-appointment-card__review"
+                                    method="post"
+                                    action="{% url 'reviews:create' appointment.pk %}"
+                                >
+                                    {% csrf_token %}
+                                    <span class="my-appointment-card__review-hint">
+                                        <i class="bi bi-star" aria-hidden="true"></i>
+                                        تجربه این ویزیت را ثبت کنید
+                                    </span>
+                                    <div class="my-appointment-card__review-inputs">
+                                        <label
+                                            class="visually-hidden"
+                                            for="rating-{{ appointment.pk }}"
+                                        >امتیاز</label>
+                                        <select
+                                            id="rating-{{ appointment.pk }}"
+                                            name="rating"
+                                            class="app-input"
+                                            required
+                                        >
+                                            <option value="" selected disabled>امتیاز…</option>
+                                            <option value="1">۱</option>
+                                            <option value="2">۲</option>
+                                            <option value="3">۳</option>
+                                            <option value="4">۴</option>
+                                            <option value="5">۵</option>
+                                        </select>
+                                        <label
+                                            class="visually-hidden"
+                                            for="comment-{{ appointment.pk }}"
+                                        >نظر (اختیاری)</label>
+                                        <input
+                                            id="comment-{{ appointment.pk }}"
+                                            type="text"
+                                            name="comment"
+                                            class="app-input"
+                                            maxlength="2000"
+                                            placeholder="نظر شما (اختیاری)"
+                                        >
+                                        <button type="submit" class="btn btn-primary app-btn app-btn--sm">
+                                            ثبت نظر
+                                        </button>
+                                    </div>
+                                </form>
+                            {% endif %}
                         {% else %}
                             <p class="my-appointment-card__note">
                                 <i class="bi bi-info-circle" aria-hidden="true"></i>

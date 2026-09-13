@@ -25,6 +25,7 @@ LOCAL_APPS = [
     "apps.doctors",
     "apps.appointments",
     "apps.wallet",
+    "apps.reviews",
 ]
 
 THIRD_PARTY_APPS = []
@@ -94,11 +95,15 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
 EMAIL_BACKEND = env(
     "EMAIL_BACKEND",
     default="django.core.mail.backends.console.EmailBackend",
 )
-DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="noreply@localhost")
+DEFAULT_FROM_EMAIL = env(
+    "DEFAULT_FROM_EMAIL",
+    default="noreply@localhost",
+)
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
