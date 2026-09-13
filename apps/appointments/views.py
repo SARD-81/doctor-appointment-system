@@ -2,10 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
-from apps.appointments.exceptions import (
-    InsufficientBalanceError,
-    SlotUnavailableError,
-)
+from apps.appointments.exceptions import InsufficientBalanceError, SlotUnavailableError
 from apps.appointments.models import AppointmentSlot
 from apps.appointments.services import BookingService
 
@@ -13,17 +10,13 @@ from apps.appointments.services import BookingService
 @login_required
 def book_appointment_view(request, slot_id: int):
     """POST-only booking endpoint; GET/HEAD safely redirect to the doctor page."""
-    slot = get_object_or_404(
-        AppointmentSlot.objects.select_related("doctor"), pk=slot_id
-    )
+    slot = get_object_or_404(AppointmentSlot.objects.select_related("doctor"), pk=slot_id)
 
     if request.method != "POST":
         return redirect("doctors:detail", doctor_id=slot.doctor.pk)
 
     try:
-        appointment = BookingService.book_appointment(
-            patient=request.user, slot_id=slot_id
-        )
+        appointment = BookingService.book_appointment(patient=request.user, slot_id=slot_id)
     except SlotUnavailableError:
         messages.error(
             request,

@@ -5,15 +5,8 @@ from django.core.mail import send_mail
 from django.db import IntegrityError, transaction
 from django.utils import timezone
 
-from apps.appointments.exceptions import (
-    InsufficientBalanceError,
-    SlotUnavailableError,
-)
-from apps.appointments.models import (
-    Appointment,
-    AppointmentSlot,
-    AppointmentStatus,
-)
+from apps.appointments.exceptions import InsufficientBalanceError, SlotUnavailableError
+from apps.appointments.models import Appointment, AppointmentSlot, AppointmentStatus
 from apps.wallet.models import Wallet, WalletTransaction
 
 logger = logging.getLogger(__name__)
@@ -49,9 +42,7 @@ class BookingService:
                 .first()
             )
             if slot is None:
-                raise SlotUnavailableError(
-                    "Slot does not exist or its doctor is inactive."
-                )
+                raise SlotUnavailableError("Slot does not exist or its doctor is inactive.")
             BookingService._validate_slot_availability(slot)
 
             visit_fee = slot.doctor.visit_fee
@@ -61,13 +52,9 @@ class BookingService:
                 # ADR-013: zero-fee visits need no wallet, debit, or ledger row.
                 wallet = Wallet.objects.select_for_update().filter(user=patient).first()
                 if wallet is None:
-                    raise InsufficientBalanceError(
-                        balance=Decimal("0.00"), required=visit_fee
-                    )
+                    raise InsufficientBalanceError(balance=Decimal("0.00"), required=visit_fee)
                 if wallet.balance < visit_fee:
-                    raise InsufficientBalanceError(
-                        balance=wallet.balance, required=visit_fee
-                    )
+                    raise InsufficientBalanceError(balance=wallet.balance, required=visit_fee)
 
             try:
                 appointment = Appointment.objects.create(

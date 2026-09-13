@@ -69,9 +69,7 @@ class TestBookingViewAccessControl:
 
 @pytest.mark.django_db(transaction=True)
 class TestBookingViewFlow:
-    def test_successful_post_renders_confirmation(
-        self, client, patient, slot
-    ):
+    def test_successful_post_renders_confirmation(self, client, patient, slot):
         client.force_login(patient)
         Wallet.objects.create(user=patient, balance=Decimal("400000.00"))
 
@@ -82,9 +80,7 @@ class TestBookingViewFlow:
         assert Appointment.objects.count() == 1
         assert Appointment.objects.get().patient == patient
 
-    def test_already_booked_slot_redirects_with_error(
-        self, client, patient, slot, doctor
-    ):
+    def test_already_booked_slot_redirects_with_error(self, client, patient, slot, doctor):
         other = User.objects.create_user(
             username="other",
             email="other@example.com",
@@ -96,25 +92,17 @@ class TestBookingViewFlow:
         client.force_login(patient)
         Wallet.objects.create(user=patient, balance=Decimal("400000.00"))
 
-        response = client.post(
-            reverse("appointments:book", args=[slot.pk]), follow=True
-        )
+        response = client.post(reverse("appointments:book", args=[slot.pk]), follow=True)
 
-        assert response.redirect_chain[-1][0] == reverse(
-            "doctors:detail", args=[doctor.pk]
-        )
+        assert response.redirect_chain[-1][0] == reverse("doctors:detail", args=[doctor.pk])
         messages = [m.message for m in response.context["messages"]]
         assert any("در دسترس نیست" in m for m in messages)
         assert Appointment.objects.count() == 1
 
-    def test_insufficient_balance_redirects_to_wallet(
-        self, client, patient, slot
-    ):
+    def test_insufficient_balance_redirects_to_wallet(self, client, patient, slot):
         client.force_login(patient)
 
-        response = client.post(
-            reverse("appointments:book", args=[slot.pk]), follow=True
-        )
+        response = client.post(reverse("appointments:book", args=[slot.pk]), follow=True)
 
         assert response.redirect_chain[-1][0] == reverse("wallet:detail")
         messages = [m.message for m in response.context["messages"]]
