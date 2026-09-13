@@ -75,13 +75,22 @@
                         </div>
                     </div>
 
-                    <form class="doctor-slot-form__actions" method="post" action="{% url 'appointments:book' selected_slot.pk %}" data-booking-form>
-                        {% csrf_token %}
-                        <button class="btn btn-primary app-btn" type="submit">
-                            <i class="bi bi-wallet2" aria-hidden="true"></i>
-                            رزرو و پرداخت {{ visit_fee }}
-                        </button>
-                    </form>
+                    {% if request.user.is_authenticated %}
+                        <form class="doctor-slot-form__actions" method="post" action="{% url 'appointments:book' selected_slot.pk %}" data-booking-form>
+                            {% csrf_token %}
+                            <button class="btn btn-primary app-btn" type="submit">
+                                <i class="bi bi-wallet2" aria-hidden="true"></i>
+                                رزرو و پرداخت {{ visit_fee }}
+                            </button>
+                        </form>
+                    {% else %}
+                        <div class="doctor-slot-form__actions">
+                            <a class="btn btn-primary app-btn" href="{% url 'accounts:login' %}?next={{ request.get_full_path|urlencode }}" data-booking-login-cta>
+                                <i class="bi bi-box-arrow-in-left" aria-hidden="true"></i>
+                                برای رزرو وارد شوید
+                            </a>
+                        </div>
+                    {% endif %}
                 {% endif %}
 
                 {% if slots %}
