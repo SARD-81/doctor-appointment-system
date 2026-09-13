@@ -18,10 +18,7 @@ class Command(BaseCommand):
             "Orthopedics",
         ]
 
-        created_specialties = [
-            Specialty.objects.get_or_create(name=name)[0]
-            for name in specialties
-        ]
+        created_specialties = [Specialty.objects.get_or_create(name=name)[0] for name in specialties]
 
         doctors = [
             ("Dr. Ali Ahmadi", created_specialties[0]),
