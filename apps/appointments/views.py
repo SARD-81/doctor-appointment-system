@@ -9,7 +9,7 @@ from apps.appointments.services import BookingService
 
 @login_required
 def book_appointment_view(request, slot_id: int):
-    """POST-only booking endpoint; GET/HEAD safely redirect to the doctor page."""
+    """POST-only booking endpoint with Post/Redirect/Get pattern."""
     slot = get_object_or_404(AppointmentSlot.objects.select_related("doctor"), pk=slot_id)
 
     if request.method != "POST":
@@ -30,6 +30,17 @@ def book_appointment_view(request, slot_id: int):
         )
         return redirect("wallet:detail")
 
+    return redirect("appointments:booking_success", appointment_id=appointment.pk)
+
+
+@login_required
+def booking_success_view(request, appointment_id: int):
+    """Dedicated GET page; only the booking owner may view it."""
+    appointment = get_object_or_404(
+        Appointment.objects.select_related("slot__doctor__specialty"),
+        pk=appointment_id,
+        patient=request.user,
+    )
     return render(
         request,
         "appointments/booking_success.html",

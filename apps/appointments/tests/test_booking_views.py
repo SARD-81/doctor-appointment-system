@@ -69,16 +69,21 @@ class TestBookingViewAccessControl:
 
 @pytest.mark.django_db(transaction=True)
 class TestBookingViewFlow:
-    def test_successful_post_renders_confirmation(self, client, patient, slot):
+    def test_successful_post_redirects_to_dedicated_success_page(self, client, patient, slot):
         client.force_login(patient)
         Wallet.objects.create(user=patient, balance=Decimal("400000.00"))
 
-        response = client.post(reverse("appointments:book", args=[slot.pk]))
+        response = client.post(reverse("appointments:book", args=[slot.pk]), follow=True)
 
         assert response.status_code == 200
         assert response.templates[0].name == "appointments/booking_success.html"
         assert Appointment.objects.count() == 1
-        assert Appointment.objects.get().patient == patient
+        appointment = Appointment.objects.get()
+        assert appointment.patient == patient
+        assert response.redirect_chain[-1][0] == reverse(
+            "appointments:booking_success", args=[appointment.pk]
+        )
+        assert "کد پیگیری" in response.content.decode("utf-8")
 
     def test_already_booked_slot_redirects_with_error(self, client, patient, slot, doctor):
         other = User.objects.create_user(
@@ -113,3 +118,42 @@ class TestBookingViewFlow:
         client.force_login(patient)
         response = client.post(reverse("appointments:book", args=[999999]))
         assert response.status_code == 404
+
+
+@pytest.mark.django_db
+class TestBookingSuccessPage:
+    def test_success_page_requires_login(self, client):
+        response = client.get(reverse("appointments:booking_success", args=[1]))
+        assert response.status_code == 302
+
+    def test_success_page_only_shows_to_booking_owner(self, client, patient, doctor, slot):
+        owner = User.objects.create_user(
+            username="success_owner",
+            email="success-owner@example.com",
+            password="StrongPass123!",
+        )
+        appointment = Appointment.objects.create(
+            patient=owner,
+            slot=slot,
+            amount_paid=Decimal("350000.00"),
+        )
+        client.force_login(patient)
+
+        response = client.get(reverse("appointments:booking_success", args=[appointment.pk]))
+
+        assert response.status_code == 404
+
+    def test_success_page_renders_for_owner(self, client, patient, doctor, slot):
+        appointment = Appointment.objects.create(
+            patient=patient,
+            slot=slot,
+            amount_paid=Decimal("350000.00"),
+        )
+        client.force_login(patient)
+
+        response = client.get(reverse("appointments:booking_success", args=[appointment.pk]))
+        html = response.content.decode("utf-8")
+
+        assert response.status_code == 200
+        assert "کد پیگیری" in html
+        assert "سارا احمدی" in html
