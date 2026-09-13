@@ -52,7 +52,7 @@ class TestWalletPage:
 
         response = client.post(reverse("wallet:detail"), {"amount": "100000"})
 
-        assert response.redirect_chain == [] or response.status_code == 302
+        assert response.status_code == 302
         funded_wallet.refresh_from_db()
         assert funded_wallet.balance == Decimal("851002.00")
         tx = funded_wallet.transactions.order_by("-created_at").first()
