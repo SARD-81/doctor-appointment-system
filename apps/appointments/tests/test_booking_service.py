@@ -57,7 +57,7 @@ def slot(db, doctor):
     )
 
 
-@pytest.mark.django_db(transaction=True)
+@pytest.mark.django_db
 class TestBookingServiceSuccess:
     def test_successful_booking_creates_confirmed_appointment_with_fee_snapshot(
         self, patient, funded_wallet, slot
@@ -95,10 +95,21 @@ class TestBookingServiceSuccess:
         assert len(mail.outbox) == 1
         assert mail.outbox[0].to == ["booking-patient@example.com"]
 
-    def test_confirmation_email_shows_local_appointment_time(self, patient, funded_wallet, slot):
-        BookingService.book_appointment(patient=patient, slot_id=slot.pk)
+    def test_confirmation_email_shows_local_appointment_time(
+        self,
+        django_capture_on_commit_callbacks,
+        patient,
+        funded_wallet,
+        slot,
+    ):
+        with django_capture_on_commit_callbacks(execute=True):
+            BookingService.book_appointment(
+                patient=patient,
+                slot_id=slot.pk,
+            )
 
         expected = timezone.localtime(slot.starts_at).strftime("%Y/%m/%d %H:%M")
+
         assert len(mail.outbox) == 1
         assert expected in mail.outbox[0].body
 
