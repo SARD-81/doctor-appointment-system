@@ -1,6 +1,6 @@
 # Architecture Decision Records — Baseline v1.0
 
-This index preserves traceability for ADR-001 through ADR-012. Statuses describe the agreed architecture baseline, not temporary feature-branch structure.
+This index preserves traceability for ADR-001 through ADR-013. Statuses describe the agreed architecture baseline, not temporary feature-branch structure.
 
 | ADR | Title | Status |
 |---|---|---|
@@ -16,6 +16,7 @@ This index preserves traceability for ADR-001 through ADR-012. Statuses describe
 | ADR-010 | Cancellation/refund out of baseline scope | Accepted baseline |
 | ADR-011 | Simulated wallet top-up | Accepted baseline |
 | ADR-012 | OTP channel/storage/lifecycle | Pending final confirmation |
+| ADR-013 | Payment snapshot range and zero-fee visits | Accepted amendment (PR #52 review feedback) |
 
 ## ADR-001 — Doctor is independent from User
 
@@ -146,6 +147,23 @@ Therefore the implementation direction is documented, but ADR-012 is not silentl
 ### ERD consequence
 
 No `OTPRequest` entity is part of the baseline ERD while cache-backed persistence remains the implementation direction. If the final decision changes to DB-backed persistence, the ERD and related UML must be updated through an explicit ADR change.
+
+## ADR-013 — Payment snapshot decimal range and zero-fee visits
+
+**Status:** Accepted amendment recorded from PR #52 review feedback; pending team re-review at merge.
+
+**Decision:**
+
+1. `Appointment.amount_paid` uses `max_digits=12` (`decimal_places=2`), aligned with `Doctor.visit_fee` and the Wallet money fields, so every storable doctor fee can be snapshotted without numeric overflow.
+2. A `visit_fee` of `0` remains valid per the ERD (`visit_fee >= 0`). Zero-fee bookings create the `Appointment` without requiring a wallet, without a debit, and without an `APPOINTMENT_PAYMENT` ledger row, because the ledger contract (`WalletTransaction.amount > 0`) cannot store a zero payment.
+
+**Rationale:** PR #52 review (Codex) flagged that the previous `max_digits=10` snapshot could overflow for valid fees and unhandled `IntegrityError` would surface as HTTP 500, and that a zero-fee insert would violate the ledger constraint. Skipping the wallet branch for free visits keeps the ledger contract honest instead of inventing zero-amount rows.
+
+**Consequences:**
+
+- Migration `appointments.0002_widen_amount_paid_digits` widens the snapshot field; no data rewrite is required.
+- The fee snapshot remains auditable (`amount_paid` equals the doctor fee at booking time), including zero.
+- The wallet lock/balance validation runs only when a payment is actually due.
 
 ## Change rule
 
