@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}نوبت‌های من | نوبت پزشک{% endblock %}
+{% block meta_description %}مشاهده نوبت‌های ثبت‌شده و سوابق ویزیت{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/my-appointments.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="my-appointments-page">
+    <div class="container">
+        <header class="my-appointments-page__header" data-reveal>
+            <span class="section-eyebrow">حساب کاربری</span>
+            <h1>نوبت‌های من</h1>
+            <p>تمام نوبت‌های ثبت‌شده و وضعیت آخرین ویزیت‌های خود را از اینجا پیگیری کنید.</p>
+        </header>
+
+        {% if appointments %}
+            <div class="my-appointments-list">
+                {% for appointment in appointments %}
+                    <article class="my-appointment-card" data-reveal>
+                        <div class="my-appointment-card__top">
+                            <span class="my-appointment-card__code">کد پیگیری #{{ appointment.pk }}</span>
+                            {% if appointment.status == 'COMPLETED' %}
+                                <span class="my-appointment-card__status my-appointment-card__status--completed">
+                                    <i class="bi bi-check2-circle" aria-hidden="true"></i>
+                                    تکمیل‌شده
+                                </span>
+                            {% else %}
+                                <span class="my-appointment-card__status my-appointment-card__status--confirmed">
+                                    <i class="bi bi-calendar2-check" aria-hidden="true"></i>
+                                    تأییدشده
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <div class="my-appointment-card__main">
+                            <div class="my-appointment-card__avatar" aria-hidden="true">
+                                {{ appointment.slot.doctor.full_name|slice:":1"|default:"د" }}
+                            </div>
+                            <div>
+                                <h2>{{ appointment.slot.doctor.full_name }}</h2>
+                                <p>{{ appointment.slot.doctor.specialty.name }}</p>
+                            </div>
+                        </div>
+
+                        <div class="my-appointment-card__details">
+                            <div>
+                                <span><i class="bi bi-calendar3" aria-hidden="true"></i> زمان مراجعه</span>
+                                <strong>{{ appointment.slot.starts_at|date:"Y/m/d - H:i" }}</strong>
+                            </div>
+                            <div>
+                                <span><i class="bi bi-wallet2" aria-hidden="true"></i> مبلغ پرداختی</span>
+                                <strong>{{ appointment.amount_paid }} تومان</strong>
+                            </div>
+                        </div>
+
+                        {% if appointment.status == 'COMPLETED' %}
+                            <p class="my-appointment-card__note">
+                                <i class="bi bi-star" aria-hidden="true"></i>
+                                این ویزیت تکمیل شده است؛ امکان ثبت نظر و امتیاز در مرحلهٔ بعد فعال می‌شود.
+                            </p>
+                        {% else %}
+                            <p class="my-appointment-card__note">
+                                <i class="bi bi-info-circle" aria-hidden="true"></i>
+                                نوبت شما ثبت شده است. لطفاً چند دقیقه پیش از زمان مراجعه در مطب حاضر باشید.
+                            </p>
+                        {% endif %}
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="my-appointments-empty" data-reveal>
+                <span class="my-appointments-empty__icon" aria-hidden="true"><i class="bi bi-calendar2-x"></i></span>
+                <h2>هنوز نوبتی رزرو نکرده‌اید</h2>
+                <p>با انتخاب پزشک و زمان مناسب، اولین نوبت خود را ثبت کنید.</p>
+                <a class="btn btn-primary app-btn" href="{% url 'doctors:list' %}">
+                    <i class="bi bi-search" aria-hidden="true"></i>
+                    مشاهده پزشکان
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

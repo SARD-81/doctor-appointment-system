@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
 from apps.appointments.exceptions import InsufficientBalanceError, SlotUnavailableError
-from apps.appointments.models import AppointmentSlot
+from apps.appointments.models import Appointment, AppointmentSlot
 from apps.appointments.services import BookingService
 
 
@@ -34,4 +34,19 @@ def book_appointment_view(request, slot_id: int):
         request,
         "appointments/booking_success.html",
         {"appointment": appointment},
+    )
+
+
+@login_required
+def my_appointments_view(request):
+    """Render only the appointments owned by the authenticated patient."""
+    appointments = (
+        Appointment.objects.filter(patient=request.user)
+        .select_related("slot__doctor__specialty")
+        .order_by("-slot__starts_at", "pk")
+    )
+    return render(
+        request,
+        "appointments/my_appointments.html",
+        {"appointments": appointments},
     )
