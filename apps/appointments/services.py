@@ -59,11 +59,7 @@ class BookingService:
             wallet = None
             if visit_fee > Decimal("0.00"):
                 # ADR-013: zero-fee visits need no wallet, debit, or ledger row.
-                wallet = (
-                    Wallet.objects.select_for_update()
-                    .filter(user=patient)
-                    .first()
-                )
+                wallet = Wallet.objects.select_for_update().filter(user=patient).first()
                 if wallet is None:
                     raise InsufficientBalanceError(
                         balance=Decimal("0.00"), required=visit_fee

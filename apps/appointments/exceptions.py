@@ -12,6 +12,4 @@ class InsufficientBalanceError(BookingError):
     def __init__(self, *, balance, required):
         self.balance = balance
         self.required = required
-        super().__init__(
-            f"Insufficient wallet balance: {balance} < {required}"
-        )
+        super().__init__(f"Insufficient wallet balance: {balance} < {required}")
