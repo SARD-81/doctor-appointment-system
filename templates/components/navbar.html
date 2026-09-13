@@ -1,0 +1,41 @@
+{% load static %}
+<nav class="navbar">
+    <div class="container navbar__inner">
+        <a class="navbar-brand" href="{% url 'home' %}" aria-label="صفحه اصلی نوبت پزشک">
+            <span class="navbar-brand__icon"><i class="bi bi-heart-pulse-fill" aria-hidden="true"></i></span>
+            <span>
+                <strong>نوبت پزشک</strong>
+                <small>رزرو آنلاین و ساده</small>
+            </span>
+        </a>
+
+        <div class="navbar-links">
+            <a href="{% url 'home' %}">خانه</a>
+            <a href="{% url 'doctors:list' %}">پزشکان</a>
+            <a href="{% url 'doctors:list' %}?specialty=">تخصص‌ها</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'appointments:my_appointments' %}">
+                    <i class="bi bi-calendar2-check" aria-hidden="true"></i>
+                    نوبت‌های من
+                </a>
+                <a href="{% url 'wallet:detail' %}">
+                    <i class="bi bi-wallet2" aria-hidden="true"></i>
+                    کیف پول
+                </a>
+            {% endif %}
+        </div>
+
+        <div class="navbar-actions">
+            {% if user.is_authenticated %}
+                <span class="navbar-user"><i class="bi bi-person-circle"></i>{{ user.get_full_name|default:user.username }}</span>
+                <form method="post" action="{% url 'accounts:logout' %}" class="navbar-logout-form">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-ghost app-btn app-btn--sm">خروج</button>
+                </form>
+            {% else %}
+                <a class="btn btn-ghost app-btn app-btn--sm" href="{% url 'accounts:login' %}">ورود</a>
+                <a class="btn btn-primary app-btn app-btn--sm" href="{% url 'accounts:register' %}">ساخت حساب</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>
