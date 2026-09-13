@@ -137,6 +137,7 @@ class TestMyAppointmentsReviewSurface:
         html = response.content.decode("utf-8")
 
         assert "امتیاز شما:" in html
+        assert "star-display" in html
         assert reverse("reviews:create", args=[appointment.pk]) not in html
 
     def test_confirmed_appointment_does_not_offer_review_form(self, client, presentation_doctor):
