@@ -1,0 +1,206 @@
+/* Patient appointment history page. */
+
+.my-appointments-page {
+    min-height: calc(100vh - 78px);
+    padding: clamp(2.3rem, 5vw, 4.5rem) 0 6rem;
+    background:
+        radial-gradient(circle at 86% 8%, rgba(85, 199, 192, 0.12), transparent 28%),
+        radial-gradient(circle at 10% 82%, rgba(23, 59, 87, 0.05), transparent 28%),
+        var(--color-bg);
+}
+
+.my-appointments-page__header {
+    display: grid;
+    gap: 0.5rem;
+    margin-bottom: 1.8rem;
+    justify-items: center;
+    text-align: center;
+}
+
+.my-appointments-page__header h1 {
+    margin: 0.55rem 0 0.25rem;
+    color: var(--color-secondary);
+    font-size: clamp(1.7rem, 3vw, 2.3rem);
+    font-weight: 900;
+}
+
+.my-appointments-page__header p {
+    max-width: 560px;
+    margin: 0;
+    color: var(--color-muted);
+    font-size: 0.9rem;
+}
+
+.my-appointments-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.my-appointment-card {
+    display: grid;
+    gap: 1rem;
+    padding: 1.2rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: var(--shadow-md);
+}
+
+.my-appointment-card__top,
+.my-appointment-card__main,
+.my-appointment-card__details {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.my-appointment-card__code,
+.my-appointment-card__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.7rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.76rem;
+    font-weight: 800;
+}
+
+.my-appointment-card__code {
+    background: var(--color-bg);
+    color: var(--color-muted);
+}
+
+.my-appointment-card__status--confirmed {
+    background: var(--color-primary-soft);
+    color: var(--color-primary-dark);
+}
+
+.my-appointment-card__status--completed {
+    background: var(--color-success-soft);
+    color: var(--color-success);
+}
+
+.my-appointment-card__main {
+    justify-content: flex-start;
+}
+
+.my-appointment-card__avatar {
+    display: grid;
+    width: 52px;
+    height: 52px;
+    flex: 0 0 auto;
+    place-items: center;
+    border-radius: 17px;
+    background: linear-gradient(135deg, var(--color-primary-soft), #d9f2ef);
+    color: var(--color-primary-dark);
+    font-size: 1.1rem;
+    font-weight: 900;
+}
+
+.my-appointment-card h2 {
+    margin: 0;
+    color: var(--color-secondary);
+    font-size: 1.05rem;
+    font-weight: 900;
+}
+
+.my-appointment-card__main p {
+    margin: 0.15rem 0 0;
+    color: var(--color-muted);
+    font-size: 0.82rem;
+}
+
+.my-appointment-card__details {
+    align-items: stretch;
+}
+
+.my-appointment-card__details > div {
+    display: grid;
+    flex: 1;
+    gap: 0.3rem;
+    padding: 0.75rem;
+    border-radius: var(--radius-md);
+    background: var(--color-bg);
+}
+
+.my-appointment-card__details span {
+    color: var(--color-muted);
+    font-size: 0.74rem;
+}
+
+.my-appointment-card__details strong {
+    color: var(--color-secondary);
+    font-size: 0.86rem;
+}
+
+.my-appointment-card__note {
+    display: flex;
+    gap: 0.45rem;
+    margin: 0;
+    padding-top: 0.9rem;
+    border-top: 1px solid var(--color-border);
+    color: var(--color-muted);
+    font-size: 0.8rem;
+    line-height: 1.8;
+}
+
+.my-appointment-card__note .bi {
+    color: var(--color-primary);
+}
+
+.my-appointments-empty {
+    display: grid;
+    max-width: 590px;
+    gap: 0.8rem;
+    margin: 0 auto;
+    padding: clamp(1.6rem, 4vw, 2.6rem);
+    justify-items: center;
+    border: 1px dashed var(--color-border-strong);
+    border-radius: var(--radius-lg);
+    background: rgba(255, 255, 255, 0.92);
+    text-align: center;
+}
+
+.my-appointments-empty__icon {
+    display: grid;
+    width: 72px;
+    height: 72px;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--color-primary-soft);
+    color: var(--color-primary-dark);
+    font-size: 1.9rem;
+}
+
+.my-appointments-empty h2 {
+    margin: 0;
+    color: var(--color-secondary);
+    font-size: 1.25rem;
+    font-weight: 900;
+}
+
+.my-appointments-empty p {
+    margin: 0;
+    color: var(--color-muted);
+    font-size: 0.88rem;
+}
+
+@media (max-width: 767.98px) {
+    .my-appointments-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .my-appointment-card__details {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+
+    .my-appointment-card__top {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

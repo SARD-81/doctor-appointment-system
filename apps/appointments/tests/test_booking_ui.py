@@ -85,11 +85,7 @@ class TestBookingActionVisibility:
         assert "data-booking-login-cta" not in html
 
     def test_authenticated_insufficient_wallet_gets_topup_guidance(
-        self,
-        client,
-        patient,
-        doctor,
-        slot,
+        self, client, patient, doctor, slot
     ):
         Wallet.objects.create(user=patient, balance=Decimal("10000.00"))
         client.force_login(patient)
