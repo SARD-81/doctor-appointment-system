@@ -52,8 +52,6 @@ class ReviewService:
                 review.save()
             except IntegrityError as exc:
                 # خط دفاع دوم: اگر دو تراکنش هم‌زمان از قفل عبور کنند، OneToOne جلوگیری می‌کند
-                raise ReviewAlreadyExistsError(
-                    "This appointment already has a review."
-                ) from exc
+                raise ReviewAlreadyExistsError("This appointment already has a review.") from exc
 
         return review

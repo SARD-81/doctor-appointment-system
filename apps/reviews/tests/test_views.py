@@ -44,9 +44,7 @@ class TestCreateReviewView:
         self, client, confirmed_appointment, patient
     ):
         client.force_login(patient)
-        response = client.post(
-            self.url(confirmed_appointment), {"rating": "5"}, follow=True
-        )
+        response = client.post(self.url(confirmed_appointment), {"rating": "5"}, follow=True)
 
         assert response.redirect_chain[-1][0] == reverse("appointments:my_appointments")
         messages = list(response.context["messages"])
@@ -73,9 +71,7 @@ class TestCreateReviewView:
 
     def test_invalid_rating_redirects_with_error(self, client, completed_appointment, patient):
         client.force_login(patient)
-        response = client.post(
-            self.url(completed_appointment), {"rating": "9"}, follow=True
-        )
+        response = client.post(self.url(completed_appointment), {"rating": "9"}, follow=True)
 
         assert response.redirect_chain[-1][0] == reverse("appointments:my_appointments")
         messages = list(response.context["messages"])

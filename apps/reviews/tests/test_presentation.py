@@ -52,9 +52,7 @@ def _add_review(doctor, username, rating):
 
 @pytest.mark.django_db
 class TestDoctorRatingPresentation:
-    def test_doctor_list_shows_rating_badge_when_reviews_exist(
-        self, client, presentation_doctor
-    ):
+    def test_doctor_list_shows_rating_badge_when_reviews_exist(self, client, presentation_doctor):
         _add_review(presentation_doctor, "rating_lister", 5)
 
         response = client.get(reverse("doctors:list"))
@@ -108,15 +106,11 @@ class TestMyAppointmentsReviewSurface:
             slot=slot,
             amount_paid=Decimal("420000.00"),
             status=status,
-            completed_at=timezone.now()
-            if status == AppointmentStatus.COMPLETED
-            else None,
+            completed_at=timezone.now() if status == AppointmentStatus.COMPLETED else None,
         )
         return patient, appointment
 
-    def test_completed_appointment_without_review_offers_form(
-        self, client, presentation_doctor
-    ):
+    def test_completed_appointment_without_review_offers_form(self, client, presentation_doctor):
         patient, appointment = self._complete_appointment(
             presentation_doctor,
             "review_form_owner",
@@ -130,9 +124,7 @@ class TestMyAppointmentsReviewSurface:
         assert reverse("reviews:create", args=[appointment.pk]) in html
         assert 'name="rating"' in html
 
-    def test_completed_appointment_with_review_shows_own_rating(
-        self, client, presentation_doctor
-    ):
+    def test_completed_appointment_with_review_shows_own_rating(self, client, presentation_doctor):
         patient, appointment = self._complete_appointment(
             presentation_doctor,
             "reviewed_owner",
@@ -147,9 +139,7 @@ class TestMyAppointmentsReviewSurface:
         assert "امتیاز شما:" in html
         assert reverse("reviews:create", args=[appointment.pk]) not in html
 
-    def test_confirmed_appointment_does_not_offer_review_form(
-        self, client, presentation_doctor
-    ):
+    def test_confirmed_appointment_does_not_offer_review_form(self, client, presentation_doctor):
         patient, appointment = self._complete_appointment(
             presentation_doctor,
             "confirmed_owner",
