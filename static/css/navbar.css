@@ -1,3 +1,14 @@
+/* Body background gradient fills the whole viewport so the floating pill navbar
+   never floats over a white strip. */
+
+body {
+    background:
+        radial-gradient(circle at 86% 8%, rgba(85, 199, 192, 0.12), transparent 28%),
+        radial-gradient(circle at 10% 82%, rgba(23, 59, 87, 0.05), transparent 28%),
+        var(--color-bg);
+    background-attachment: fixed;
+}
+
 /* Floating glass pill navbar — replaces legacy bar. RTL ordered: brand right, links center, actions left. */
 
 .site-nav {
