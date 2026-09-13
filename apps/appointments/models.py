@@ -51,7 +51,7 @@ class AppointmentSlot(models.Model):
 
 
 class Appointment(models.Model):
-    """مدل ثبت نوبت رزرو شده بیمار به همراه لاگ تکمیل و بازرسی."""
+    """مدل ثبت نوبت رزرو شده بیمار به همراه لاگ تکمیل و بازbینی."""
 
     patient = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -71,9 +71,10 @@ class Appointment(models.Model):
         choices=AppointmentStatus.choices,
         default=AppointmentStatus.CONFIRMED,
     )
+    # ADR-013: با Doctor.visit_fee و فیلدهای پولی Wallet هم‌راSتاست (12 رقم)
     amount_paid = models.DecimalField(
         _("Amount paid"),
-        max_digits=10,
+        max_digits=12,
         decimal_places=2,
     )
     booked_at = models.DateTimeField(_("Booked at"), auto_now_add=True)

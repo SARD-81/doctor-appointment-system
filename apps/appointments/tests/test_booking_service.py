@@ -95,12 +95,52 @@ class TestBookingServiceSuccess:
     def test_confirmation_email_is_sent_after_commit(
         self, django_capture_on_commit_callbacks, patient, funded_wallet, slot
     ):
-        callbacks = django_capture_on_commit_callbacks(execute=True)
-        BookingService.book_appointment(patient=patient, slot_id=slot.pk)
+        with django_capture_on_commit_callbacks(execute=True) as callbacks:
+            BookingService.book_appointment(patient=patient, slot_id=slot.pk)
 
         assert len(callbacks) == 1
         assert len(mail.outbox) == 1
         assert mail.outbox[0].to == ["booking-patient@example.com"]
+
+    def test_confirmation_email_shows_local_appointment_time(
+        self, patient, funded_wallet, slot
+    ):
+        BookingService.book_appointment(patient=patient, slot_id=slot.pk)
+
+        expected = timezone.localtime(slot.starts_at).strftime("%Y/%m/%d %H:%M")
+        assert len(mail.outbox) == 1
+        assert expected in mail.outbox[0].body
+
+    def test_zero_fee_visit_books_without_wallet_or_ledger(
+        self, patient, doctor, slot
+    ):
+        doctor.visit_fee = Decimal("0.00")
+        doctor.save()
+
+        appointment = BookingService.book_appointment(patient=patient, slot_id=slot.pk)
+
+        assert appointment.status == AppointmentStatus.CONFIRMED
+        assert appointment.amount_paid == Decimal("0.00")
+        # کیف پول برای ویزیت رایگان لازم نیست و رکورد ledger صفر ممنوع است
+        assert Wallet.objects.filter(user=patient).count() == 0
+        assert WalletTransaction.objects.count() == 0
+
+    def test_large_fee_snapshot_matched_with_wallet_digits(
+        self, patient, doctor, slot
+    ):
+        big_fee = Decimal("1234567890.12")
+        doctor.visit_fee = big_fee
+        doctor.save()
+        wallet = Wallet.objects.create(user=patient, balance=big_fee)
+
+        appointment = BookingService.book_appointment(patient=patient, slot_id=slot.pk)
+
+        assert appointment.amount_paid == big_fee
+        wallet.refresh_from_db()
+        assert wallet.balance == Decimal("0.00")
+        tx = wallet.transactions.get()
+        assert tx.amount == big_fee
+        assert tx.balance_after == Decimal("0.00")
 
 
 @pytest.mark.django_db(transaction=True)

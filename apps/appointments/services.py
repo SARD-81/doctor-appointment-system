@@ -26,7 +26,8 @@ class BookingService:
       1. Slot row locked with SELECT FOR UPDATE, then revalidated.
       2. Wallet row locked with SELECT FOR UPDATE, then balance checked.
       3. Appointment created in CONFIRMED state with a visit_fee snapshot.
-      4. Wallet debited and an APPOINTMENT_PAYMENT ledger entry written.
+      4. Wallet debited and an APPOINTMENT_PAYMENT ledger entry written
+         (skipped for zero-fee visits per ADR-013).
       5. Confirmation email is sent only after COMMIT (on_commit hook).
 
     FailureContract: any failure raises a domain error (or propagates the DB
@@ -55,17 +56,22 @@ class BookingService:
 
             visit_fee = slot.doctor.visit_fee
 
-            wallet = (
-                Wallet.objects.select_for_update().filter(user=patient).first()
-            )
-            if wallet is None:
-                raise InsufficientBalanceError(
-                    balance=Decimal("0.00"), required=visit_fee
+            wallet = None
+            if visit_fee > Decimal("0.00"):
+                # ADR-013: zero-fee visits need no wallet, debit, or ledger row.
+                wallet = (
+                    Wallet.objects.select_for_update()
+                    .filter(user=patient)
+                    .first()
                 )
-            if wallet.balance < visit_fee:
-                raise InsufficientBalanceError(
-                    balance=wallet.balance, required=visit_fee
-                )
+                if wallet is None:
+                    raise InsufficientBalanceError(
+                        balance=Decimal("0.00"), required=visit_fee
+                    )
+                if wallet.balance < visit_fee:
+                    raise InsufficientBalanceError(
+                        balance=wallet.balance, required=visit_fee
+                    )
 
             try:
                 appointment = Appointment.objects.create(
@@ -79,19 +85,21 @@ class BookingService:
                     "Slot could not be booked due to a database conflict."
                 ) from exc
 
-            wallet.balance = wallet.balance - visit_fee
-            wallet.save(update_fields=["balance", "updated_at"])
+            if wallet is not None:
+                wallet.balance = wallet.balance - visit_fee
+                wallet.save(update_fields=["balance", "updated_at"])
 
-            WalletTransaction.objects.create(
-                wallet=wallet,
-                appointment=appointment,
-                transaction_type=WalletTransaction.APPOINTMENT_PAYMENT,
-                amount=visit_fee,
-                balance_after=wallet.balance,
-            )
+                WalletTransaction.objects.create(
+                    wallet=wallet,
+                    appointment=appointment,
+                    transaction_type=WalletTransaction.APPOINTMENT_PAYMENT,
+                    amount=visit_fee,
+                    balance_after=wallet.balance,
+                )
 
             transaction.on_commit(
-                lambda: BookingService._send_confirmation_email(appointment)
+                lambda: BookingService._send_confirmation_email(appointment),
+                robust=True,
             )
 
         return appointment
@@ -116,12 +124,14 @@ class BookingService:
         try:
             if not appointment.patient.email:
                 return
+            local_start = timezone.localtime(appointment.slot.starts_at)
+            formatted_start = local_start.strftime("%Y/%m/%d %H:%M")
             send_mail(
                 subject="تأیید رزرو نوبت",
                 message=(
                     f"نوبت شماره {appointment.pk} برای شما ثبت شد.\n"
                     f"پزشک: {appointment.slot.doctor.full_name}\n"
-                    f"زمان: {appointment.slot.starts_at}\n"
+                    f"زمان: {formatted_start}\n"
                     f"مبلغ پرداخت‌شده: {appointment.amount_paid}"
                 ),
                 from_email=None,
