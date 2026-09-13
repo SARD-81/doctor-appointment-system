@@ -50,10 +50,14 @@ def booking_success_view(request, appointment_id: int):
 
 @login_required
 def my_appointments_view(request):
-    """Render only the appointments owned by the authenticated patient."""
+    """Render only the appointments owned by the authenticated patient.
+
+    select_related("review") از به وجود آمدن N+1 هنگام تصمیم‌گیری
+    دربارهٔ نمایش فرم ثبت نظر یا امتیاز ثبت‌شده جلوگیری می‌کند.
+    """
     appointments = (
         Appointment.objects.filter(patient=request.user)
-        .select_related("slot__doctor__specialty")
+        .select_related("slot__doctor__specialty", "review")
         .order_by("-slot__starts_at", "pk")
     )
     return render(

@@ -150,6 +150,208 @@
     color: var(--color-primary);
 }
 
+/* ---- Review submission: CSS-only star rating widget ---- */
+
+.my-appointment-card__review {
+    display: grid;
+    gap: 0.9rem;
+    margin: 0;
+    padding: 1rem;
+    border: 1px dashed var(--color-border-strong);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-soft);
+}
+
+.my-appointment-card__review-hint {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.45rem;
+    color: var(--color-secondary);
+    font-size: 0.84rem;
+    font-weight: 800;
+}
+
+.my-appointment-card__review-hint .bi {
+    color: var(--color-primary);
+}
+
+.my-appointment-card__review-hint small {
+    color: var(--color-muted);
+    font-size: 0.74rem;
+    font-weight: 500;
+}
+
+.star-rating {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.65rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.star-rating__stars {
+    display: inline-flex;
+    flex-direction: row-reverse;
+    direction: ltr;
+    gap: 0.2rem;
+}
+
+.star-rating__stars input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    opacity: 0;
+}
+
+.star-rating__stars label {
+    display: inline-grid;
+    place-items: center;
+    color: #ccd8e2;
+    cursor: pointer;
+    font-size: 1.45rem;
+    line-height: 1;
+    transition:
+        color var(--transition),
+        transform var(--transition);
+}
+
+.star-rating__stars label:hover,
+.star-rating__stars label:hover ~ label,
+.star-rating__stars input:checked ~ label {
+    color: #e1a624;
+}
+
+.star-rating__stars label:hover {
+    transform: scale(1.12);
+}
+
+.star-rating__stars input:focus-visible + label {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 3px;
+    border-radius: 6px;
+}
+
+.star-rating__hint {
+    color: var(--color-muted);
+    font-size: 0.78rem;
+}
+
+.star-rating:has(input[value="1"]:checked) .star-rating__hint {
+    color: var(--color-danger);
+    font-weight: 750;
+}
+
+.star-rating:has(input[value="1"]:checked) .star-rating__hint::after {
+    content: "۱ — خیلی ضعیف";
+}
+
+.star-rating:has(input[value="2"]:checked) .star-rating__hint {
+    color: var(--color-warning);
+    font-weight: 750;
+}
+
+.star-rating:has(input[value="2"]:checked) .star-rating__hint::after {
+    content: "۲ — ضعیف";
+}
+
+.star-rating:has(input[value="3"]:checked) .star-rating__hint {
+    color: var(--color-info);
+    font-weight: 750;
+}
+
+.star-rating:has(input[value="3"]:checked) .star-rating__hint::after {
+    content: "۳ — متوسط";
+}
+
+.star-rating:has(input[value="4"]:checked) .star-rating__hint {
+    color: var(--color-primary-dark);
+    font-weight: 750;
+}
+
+.star-rating:has(input[value="4"]:checked) .star-rating__hint::after {
+    content: "۴ — خوب";
+}
+
+.star-rating:has(input[value="5"]:checked) .star-rating__hint {
+    color: var(--color-success);
+    font-weight: 750;
+}
+
+.star-rating:has(input[value="5"]:checked) .star-rating__hint::after {
+    content: "۵ — عالی 💙";
+}
+
+.my-appointment-card__review .star-rating:has(input:checked) .star-rating__hint {
+    visibility: hidden;
+    gap: 0;
+}
+
+.my-appointment-card__review .star-rating:has(input:checked) .star-rating__hint::after {
+    visibility: visible;
+}
+
+.my-appointment-card__review .app-field__label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.84rem;
+}
+
+.my-appointment-card__review textarea {
+    min-height: 88px;
+    resize: vertical;
+}
+
+.my-appointment-card__review .app-btn {
+    justify-self: start;
+}
+
+/* ---- Submitted review display ---- */
+
+.my-appointment-card__submitted-review {
+    display: grid;
+    gap: 0.5rem;
+    padding: 0.95rem 1rem;
+    border: 1px solid rgba(22, 128, 78, 0.14);
+    border-radius: var(--radius-md);
+    background: var(--color-success-soft);
+}
+
+.my-appointment-card__submitted-review-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.star-display {
+    display: inline-flex;
+    gap: 0.15rem;
+    color: #e1a624;
+    font-size: 1rem;
+}
+
+.my-appointment-card__submitted-review-date {
+    color: var(--color-muted);
+    font-size: 0.74rem;
+}
+
+.my-appointment-card__submitted-review-comment {
+    margin: 0;
+    color: var(--color-secondary);
+    font-size: 0.86rem;
+    line-height: 1.9;
+}
+
+.my-appointment-card__submitted-review .my-appointment-card__note {
+    padding-top: 0.5rem;
+    border-top: 1px dashed rgba(22, 128, 78, 0.18);
+}
+
 .my-appointments-empty {
     display: grid;
     max-width: 590px;
@@ -202,5 +404,23 @@
     .my-appointment-card__top {
         align-items: flex-start;
         flex-direction: column;
+    }
+
+    .star-rating__stars label {
+        font-size: 1.7rem;
+    }
+
+    .my-appointment-card__review .app-btn {
+        width: 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .star-rating__stars label {
+        transition: none;
+    }
+
+    .star-rating__stars label:hover {
+        transform: none;
     }
 }
