@@ -8,9 +8,10 @@ WORKDIR /app
 
 # کپی و نصب مستقیم وابستگی‌ها بر اساس نسخه مشخص مخزن
 COPY requirements.txt /app/
+#RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# کپی سورس‌کد به داخل کانتینر
+
 COPY . /app/
 
 EXPOSE 8000
