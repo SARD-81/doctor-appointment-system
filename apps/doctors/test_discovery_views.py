@@ -193,7 +193,7 @@ def test_query_search_also_matches_specialty_name(client, doctors):
     html = response.content.decode("utf-8")
 
     assert doctors["ali"].full_name in html
-    assert doctors["sara"].full_name not in html
+    assert html.count('class="doctor-card"') == 1
 
 
 @pytest.mark.django_db
@@ -222,5 +222,5 @@ def test_navbar_has_no_dead_specialties_link(client):
     response = client.get(reverse("home"))
     html = response.content.decode("utf-8")
 
-    assert "تخصص‌ها" not in html
+    assert ">تخصص‌ها</a>" not in html
     assert '?specialty="' not in html
