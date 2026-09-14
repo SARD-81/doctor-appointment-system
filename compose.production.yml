@@ -1,7 +1,6 @@
 services:
   db:
-    image: postgres:16-alpine
-    container_name: doctor_appointment_prod_db
+    image: postgres:16-alpine    
     restart: unless-stopped
     env_file:
       - .env.production
@@ -18,8 +17,8 @@ services:
   web:
     build:
       context: .
-      dockerfile: docker/production/Dockerfile
-    container_name: doctor_appointment_prod_web
+      dockerfile: docker/production/Dockerfile    
+    command: gunicorn --bind 0.0.0.0:8000 config.wsgi:application
     restart: unless-stopped
     env_file:
       - .env.production
@@ -36,7 +35,6 @@ services:
 
   nginx:
     image: nginx:alpine
-    container_name: doctor_appointment_prod_nginx
     restart: unless-stopped
     ports:
       - "80:80"
