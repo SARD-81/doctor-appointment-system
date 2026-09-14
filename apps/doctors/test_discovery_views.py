@@ -185,3 +185,42 @@ def test_doctors_navigation_points_to_discovery(client, doctors):
 
     assert f'href="{reverse("doctors:list")}"' in html
     assert ">پزشکان</a>" in html
+
+
+@pytest.mark.django_db
+def test_query_search_also_matches_specialty_name(client, doctors):
+    response = client.get(reverse("doctors:list"), {"q": "مغز"})
+    html = response.content.decode("utf-8")
+
+    assert doctors["ali"].full_name in html
+    assert doctors["sara"].full_name not in html
+
+
+@pytest.mark.django_db
+def test_hero_search_form_submits_to_doctor_discovery(client):
+    response = client.get(reverse("home"))
+    html = response.content.decode("utf-8")
+
+    assert f'action="{reverse("doctors:list")}"' in html
+    assert 'name="q"' in html
+    assert 'type="search"' in html
+    assert 'type="submit"' in html
+
+
+@pytest.mark.django_db
+def test_landing_cta_is_a_real_link_to_doctor_discovery(client):
+    response = client.get(reverse("home"))
+    html = response.content.decode("utf-8")
+
+    assert "مشاهده پزشکان" in html
+    assert f'href="{reverse("doctors:list")}"' in html
+    assert 'btn-light app-btn app-btn--light" type="button"' not in html
+
+
+@pytest.mark.django_db
+def test_navbar_has_no_dead_specialties_link(client):
+    response = client.get(reverse("home"))
+    html = response.content.decode("utf-8")
+
+    assert "تخصص‌ها" not in html
+    assert '?specialty="' not in html

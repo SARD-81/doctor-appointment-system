@@ -21,7 +21,6 @@
         <ul class="site-nav__links" id="site-nav-menu">
             <li><a href="{% url 'home' %}">خانه</a></li>
             <li><a href="{% url 'doctors:list' %}">پزشکان</a></li>
-            <li><a href="{% url 'doctors:list' %}?specialty=">تخصص‌ها</a></li>
             {% if user.is_authenticated %}
                 <li>
                     <a href="{% url 'appointments:my_appointments' %}">

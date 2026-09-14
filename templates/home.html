@@ -26,22 +26,25 @@
                     فرایند رزرو را آنلاین انجام دهید.
                 </p>
 
-                <div class="search-shell" aria-label="پیش‌نمایش جستجوی پزشک">
+                <form class="search-shell" action="{% url 'doctors:list' %}" method="get"
+                      role="search" aria-label="جستجوی پزشک">
                     <div class="search-shell__icon">
-                        <i class="bi bi-search"></i>
+                        <i class="bi bi-search" aria-hidden="true"></i>
                     </div>
 
                     <div class="search-shell__content">
-                        <span class="search-shell__label">جستجوی پزشک یا تخصص</span>
-                        <span class="search-shell__placeholder">
-                            مثال: قلب و عروق، دکتر احمدی...
-                        </span>
+                        <label class="search-shell__label" for="hero-search">
+                            جستجوی پزشک یا تخصص
+                        </label>
+                        <input class="search-shell__input" id="hero-search" type="search"
+                               name="q" placeholder="مثال: قلب و عروق، دکتر احمدی..."
+                               autocomplete="off">
                     </div>
 
-                    <button class="btn btn-primary app-btn" type="button" disabled>
+                    <button class="btn btn-primary app-btn" type="submit">
                         جستجو
                     </button>
-                </div>
+                </form>
 
                 <div class="hero-features">
                     <div class="hero-feature">
@@ -206,11 +209,11 @@
             <div>
                 <span class="eyebrow eyebrow--light">شروع ساده</span>
                 <h2>برای پیدا کردن پزشک مناسب آماده‌اید؟</h2>
-                <p>قابلیت جستجو در مرحله بعد به همین رابط متصل خواهد شد.</p>
+                <p>لیست کامل پزشکان و تخصص‌های فعال را همین حالا ببینید.</p>
             </div>
-            <button class="btn btn-light app-btn app-btn--light" type="button" disabled>
+            <a class="btn btn-light app-btn app-btn--light" href="{% url 'doctors:list' %}">
                 مشاهده پزشکان
-            </button>
+            </a>
         </div>
     </div>
 </section>
