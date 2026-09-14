@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}کیف پول | نوبت پزشک{% endblock %}
+{% block meta_description %}مدیریت کیف پول و تاریخچه تراکنش‌های مالی{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/wallet.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="wallet-page">
+    <div class="container">
+        <header class="wallet-page__header" data-reveal>
+            <span class="section-eyebrow">مدیریت مالی</span>
+            <h1>کیف پول شما</h1>
+            <p>با شارژ کیف پول، هزینهٔ ویزیت را مستقیم و بدون درگاه خارجی پرداخت کنید.</p>
+        </header>
+
+        <div class="wallet-layout">
+            <aside class="wallet-balance-card" data-reveal>
+                <span class="wallet-balance-card__label">موجودی فعلی</span>
+                <strong class="wallet-balance-card__amount">{{ wallet.balance }} <small>تومان</small></strong>
+                <span class="wallet-balance-card__hint">قابل استفاده برای رزرو نوبت در همان لحظه</span>
+
+                <div class="wallet-balance-card__meta">
+                    <div>
+                        <span>تعداد تراکنش</span>
+                        <strong>{{ wallet.transactions.count }} تراکنش</strong>
+                    </div>
+                    <div>
+                        <span>وضعیت حساب</span>
+                        <strong class="wallet-balance-card__ok">
+                            <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+                            فعال
+                        </strong>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="wallet-panel" data-reveal>
+                <header class="wallet-panel__section">
+                    <h2>افزایش موجودی</h2>
+                    <p>مبلغ دلخواه را وارد کنید یا یکی از مبالغ پرتکرار را انتخاب کنید.</p>
+                </header>
+
+                <form method="post" class="wallet-topup">
+                    {% csrf_token %}
+                    <div class="wallet-topup__field">
+                        <label class="visually-hidden" for="topup-amount">مبلغ افزایش موجودی</label>
+                        <input id="topup-amount" type="number" name="amount" step="0.01" min="1" placeholder="مبلغ دلخواه (تومان)">
+                        <button class="btn btn-primary app-btn" type="submit">
+                            <i class="bi bi-plus-circle" aria-hidden="true"></i>
+                            افزایش موجودی
+                        </button>
+                    </div>
+                    <div class="wallet-topup__presets" aria-label="مبالغ پرتکرار">
+                        <button type="submit" name="amount" value="100000">۱۰۰,۰۰۰</button>
+                        <button type="submit" name="amount" value="250000">۲۵۰,۰۰۰</button>
+                        <button type="submit" name="amount" value="500000">۵۰۰,۰۰۰</button>
+                        <button type="submit" name="amount" value="1000000">۱,۰۰۰,۰۰۰</button>
+                    </div>
+                    <p class="wallet-topup__hint">
+                        <i class="bi bi-info-circle" aria-hidden="true"></i>
+                        شارژ آنلاین فعلاً شبیه‌سازی شده و بدون درگاه واقعی انجام می‌شود.
+                    </p>
+                </form>
+
+                <header class="wallet-panel__section wallet-panel__section--ledger">
+                    <h2>تراکنش‌ها</h2>
+                </header>
+
+                <ul class="wallet-tx">
+                    {% for transaction in wallet.transactions.all %}
+                        <li class="wallet-tx__row {% if transaction.transaction_type == 'TOP_UP' %}wallet-tx__row--income{% else %}wallet-tx__row--expense{% endif %}">
+                            <span class="wallet-tx__icon" aria-hidden="true">
+                                <i class="bi {% if transaction.transaction_type == 'TOP_UP' %}bi-arrow-down-circle{% else %}bi-arrow-up-circle{% endif %}"></i>
+                            </span>
+                            <div class="wallet-tx__info">
+                                <strong>
+                                    {% if transaction.transaction_type == 'TOP_UP' %}
+                                        شارژ کیف پول
+                                    {% else %}
+                                        پرداخت نوبت
+                                    {% endif %}
+                                </strong>
+                                <span>
+                                    {{ transaction.created_at|date:"Y/m/d - H:i" }}
+                                    {% if transaction.appointment %}
+                                        · رزرو #{{ transaction.appointment.pk }}
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="wallet-tx__amounts">
+                                <strong>
+                                    {% if transaction.transaction_type == 'TOP_UP' %}+{% else %}−{% endif %}{{ transaction.amount }}
+                                    <small>تومان</small>
+                                </strong>
+                                <span>موجودی پس از تراکنش: {{ transaction.balance_after }}</span>
+                            </div>
+                        </li>
+                    {% empty %}
+                        <li class="wallet-tx__empty">
+                            <i class="bi bi-receipt" aria-hidden="true"></i>
+                            هنوز تراکنشی ثبت نشده است. با اولین شارژ کیف پول، تاریخچه شما اینجا نمایش داده می‌شود.
+                        </li>
+                    {% endfor %}
+                </ul>
+            </main>
+        </div>
+    </div>
+</section>
+{% endblock %}

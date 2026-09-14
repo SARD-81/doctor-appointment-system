@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ doctor.full_name }} | نوبت پزشک{% endblock %}
+{% block meta_description %}مشاهده اطلاعات {{ doctor.full_name }} و انتخاب زمان نوبت آزاد{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/doctors.css' %}">
+<link rel="stylesheet" href="{% static 'css/booking.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="doctor-detail">
+    <div class="container">
+        <a class="doctor-detail__back" href="{% url 'doctors:list' %}">
+            <i class="bi bi-arrow-right" aria-hidden="true"></i>
+            بازگشت به پزشکان
+        </a>
+
+        <div class="doctor-detail__layout">
+            <aside class="doctor-profile-panel" data-reveal>
+                <div class="doctor-profile-panel__avatar" aria-hidden="true">
+                    {{ doctor.full_name|slice:":1"|default:"د" }}
+                </div>
+
+                <div>
+                    <span class="section-eyebrow">پروفایل پزشک</span>
+                    <h1>{{ doctor.full_name }}</h1>
+                    <p class="doctor-profile-panel__specialty">{{ doctor.specialty.name }}</p>
+                </div>
+
+                <div class="doctor-profile-panel__meta">
+                    <div>
+                        <span>هزینه ویزیت</span>
+                        <strong>{{ visit_fee }}</strong>
+                    </div>
+                    <div>
+                        <span>میانگین امتیاز</span>
+                        <strong>
+                            {% if average_rating %}
+                                {{ average_rating }} از ۵ ({{ review_count }} نظر)
+                            {% else %}
+                                هنوز نظری ثبت نشده است
+                            {% endif %}
+                        </strong>
+                    </div>
+                    <div>
+                        <span>وضعیت پذیرش</span>
+                        <strong class="doctor-profile-panel__available">
+                            <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+                            فعال
+                        </strong>
+                    </div>
+                </div>
+
+                <p class="doctor-profile-panel__note">
+                    زمان‌های زیر مستقیماً از برنامه فعال پزشک خوانده می‌شوند و فقط نوبت‌های آینده و رزرو‌نشده نمایش داده می‌شوند.
+                </p>
+            </aside>
+
+            <main class="doctor-slots-panel" data-reveal>
+                <header class="doctor-slots-panel__header">
+                    <div>
+                        <span class="section-eyebrow">زمان مراجعه</span>
+                        <h2>انتخاب نوبت آزاد</h2>
+                        <p>یکی از زمان‌های در دسترس را انتخاب کنید. رزرو و پرداخت نهایی در مرحله بعد انجام می‌شود.</p>
+                    </div>
+                    {% if slots %}
+                        <span class="doctor-slots-panel__count">{{ slots|length }} زمان آزاد</span>
+                    {% endif %}
+                </header>
+
+                <div class="booking-steps" aria-label="مراحل رزرو نوبت">
+                    <span class="booking-steps__step {% if selected_slot %}booking-steps__step--done{% else %}booking-steps__step--active{% endif %}">
+                        <i class="bi {% if selected_slot %}bi-check-circle-fill{% else %}bi-calendar2-week{% endif %}" aria-hidden="true"></i>
+                        ۱) انتخاب زمان
+                    </span>
+                    <span class="booking-steps__step {% if selected_slot %}booking-steps__step--active{% endif %}">
+                        <i class="bi bi-credit-card" aria-hidden="true"></i>
+                        ۲) مرور و پرداخت
+                    </span>
+                    <span class="booking-steps__step">
+                        <i class="bi bi-patch-check" aria-hidden="true"></i>
+                        ۳) تأیید نهایی
+                    </span>
+                </div>
+
+                {% if selected_slot_invalid %}
+                    <div class="doctor-slot-feedback doctor-slot-feedback--warning" role="status">
+                        <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+                        <span>زمان انتخاب‌شده معتبر یا در دسترس نیست. لطفاً یکی از نوبت‌های آزاد را انتخاب کنید.</span>
+                    </div>
+                {% endif %}
+
+                {% if selected_slot %}
+                    <div class="booking-summary" data-booking-summary role="region" aria-label="مرور و پرداخت">
+                        <div class="doctor-slot-feedback doctor-slot-feedback--success" role="status">
+                            <i class="bi bi-check-circle" aria-hidden="true"></i>
+                            <div>
+                                <strong>زمان انتخاب‌شده</strong>
+                                <span>{{ selected_slot.starts_at|date:"Y/m/d - H:i" }}</span>
+                            </div>
+                        </div>
+
+                        <ul class="booking-summary__list">
+                            <li>
+                                <span>پزشک</span>
+                                <strong>{{ doctor.full_name }}</strong>
+                            </li>
+                            <li>
+                                <span>زمان مراجعه</span>
+                                <strong>{{ selected_slot.starts_at|date:"Y/m/d - H:i" }}</strong>
+                            </li>
+                            <li>
+                                <span>هزینه ویزیت</span>
+                                <strong>{{ visit_fee }}</strong>
+                            </li>
+                            {% if request.user.is_authenticated and user.wallet %}
+                                <li class="{% if user.wallet.balance < doctor.visit_fee %}booking-summary__wallet--low{% endif %}">
+                                    <span>موجودی کیف پول</span>
+                                    <strong>{{ user.wallet.balance }} تومان</strong>
+                                </li>
+                            {% endif %}
+                        </ul>
+
+                        {% if request.user.is_authenticated %}
+                            {% if user.wallet and user.wallet.balance < doctor.visit_fee %}
+                                <div class="doctor-slot-feedback doctor-slot-feedback--warning" data-booking-insufficient role="status">
+                                    <i class="bi bi-wallet2" aria-hidden="true"></i>
+                                    <div>
+                                        <strong>موجودی کیف پول کافی نیست</strong>
+                                        <span>برای رزرو این نوبت، ابتدا کیف پول خود را شارژ کنید.</span>
+                                    </div>
+                                </div>
+                                <div class="doctor-slot-form__actions">
+                                    <a class="btn btn-primary app-btn" href="{% url 'wallet:detail' %}">
+                                        <i class="bi bi-wallet2" aria-hidden="true"></i>
+                                        افزایش موجودی کیف پول
+                                    </a>
+                                </div>
+                            {% elif not user.wallet and doctor.visit_fee > 0 %}
+                                <div class="doctor-slot-feedback doctor-slot-feedback--warning" data-booking-no-wallet role="status">
+                                    <i class="bi bi-info-circle" aria-hidden="true"></i>
+                                    <div>
+                                        <strong>پرداخت از طریق کیف پول انجام می‌شود</strong>
+                                        <span>کیف پول شما هنوز شارژ نشده است.</span>
+                                    </div>
+                                </div>
+                                <div class="doctor-slot-form__actions">
+                                    <a class="btn btn-primary app-btn" href="{% url 'wallet:detail' %}">
+                                        <i class="bi bi-wallet2" aria-hidden="true"></i>
+                                        افزایش موجودی کیف پول
+                                    </a>
+                                </div>
+                            {% else %}
+                                <form class="doctor-slot-form__actions" method="post" action="{% url 'appointments:book' selected_slot.pk %}" data-booking-form>
+                                    {% csrf_token %}
+                                    <button class="btn btn-primary app-btn" type="submit">
+                                        <i class="bi bi-wallet2" aria-hidden="true"></i>
+                                        رزرو و پرداخت {{ visit_fee }}
+                                    </button>
+                                </form>
+                            {% endif %}
+                        {% else %}
+                            <div class="doctor-slot-form__actions">
+                                <a class="btn btn-primary app-btn" href="{% url 'accounts:login' %}?next={{ request.get_full_path|urlencode }}" data-booking-login-cta>
+                                    <i class="bi bi-box-arrow-in-left" aria-hidden="true"></i>
+                                    برای رزرو وارد شوید
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+                {% if slots %}
+                    <form class="doctor-slot-form" method="get" action="{% url 'doctors:detail' doctor.pk %}">
+                        <fieldset>
+                            <legend class="visually-hidden">انتخاب زمان نوبت</legend>
+                            <div class="doctor-slot-grid">
+                                {% for slot in slots %}
+                                    {% if selected_slot_id == slot.pk %}
+                                        {% include "components/slot_chip.html" with name="slot" value=slot.pk label=slot.starts_at|date:"Y/m/d - H:i" selected=True %}
+                                    {% else %}
+                                        {% include "components/slot_chip.html" with name="slot" value=slot.pk label=slot.starts_at|date:"Y/m/d - H:i" %}
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </fieldset>
+
+                        <div class="doctor-slot-form__actions">
+                            <button class="btn btn-primary app-btn" type="submit">
+                                <i class="bi bi-calendar2-check" aria-hidden="true"></i>
+                                تأیید انتخاب زمان
+                            </button>
+                            {% if selected_slot %}
+                                <a class="btn btn-ghost app-btn" href="{% url 'doctors:detail' doctor.pk %}">
+                                    تغییر انتخاب
+                                </a>
+                            {% endif %}
+                        </div>
+                    </form>
+                {% else %}
+                    <div class="doctor-detail__empty">
+                        {% url "doctors:list" as doctor_list_url %}
+                        {% include "components/empty_state.html" with icon="bi-calendar2-x" title="در حال حاضر نوبت آزادی برای این پزشک وجود ندارد" description="می‌توانید پزشک دیگری را بررسی کنید یا بعداً دوباره به این صفحه برگردید." action_url=doctor_list_url action_label="مشاهده پزشکان" %}
+                    </div>
+                {% endif %}
+            </main>
+        </div>
+    </div>
+</section>
+{% endblock %}

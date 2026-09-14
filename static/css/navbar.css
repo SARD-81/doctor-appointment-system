@@ -1,0 +1,215 @@
+/* Body background gradient fills the whole viewport so the floating pill navbar
+   never floats over a white strip. */
+
+body {
+    background:
+        radial-gradient(circle at 86% 8%, rgba(85, 199, 192, 0.12), transparent 28%),
+        radial-gradient(circle at 10% 82%, rgba(23, 59, 87, 0.05), transparent 28%),
+        var(--color-bg);
+    background-attachment: fixed;
+}
+
+/* Floating glass pill navbar — replaces legacy bar. RTL ordered: brand right, links center, actions left. */
+
+.site-nav {
+    position: sticky;
+    top: 0.75rem;
+    z-index: 1000;
+    padding: 0 1rem;
+}
+
+.site-nav__pill {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0.6rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.72);
+    box-shadow:
+        0 20px 45px rgba(15, 107, 109, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+.site-nav__brand {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-inline-start: auto;
+    text-decoration: none;
+    color: var(--color-secondary);
+}
+
+.site-nav__logo {
+    display: grid;
+    width: 40px;
+    height: 40px;
+    place-items: center;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+    color: #ffffff;
+    font-size: 1.1rem;
+    box-shadow: 0 8px 18px rgba(15, 107, 109, 0.28);
+}
+
+.site-nav__title {
+    display: grid;
+    gap: 0;
+    line-height: 1.2;
+}
+
+.site-nav__title strong {
+    font-size: 0.95rem;
+    font-weight: 900;
+}
+
+.site-nav__title small {
+    color: var(--color-muted);
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.site-nav__links {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin: 0 auto;
+    padding: 0;
+    list-style: none;
+}
+
+.site-nav__links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.55rem 0.9rem;
+    border-radius: var(--radius-pill);
+    color: var(--color-muted);
+    font-size: 0.86rem;
+    font-weight: 750;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.site-nav__links a:hover,
+.site-nav__links a:focus-visible {
+    background: var(--color-primary-soft);
+    color: var(--color-primary-dark);
+    outline: none;
+}
+
+.site-nav__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-inline-start: auto;
+}
+
+.site-nav__user {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.9rem;
+    border-radius: var(--radius-pill);
+    background: var(--color-bg);
+    color: var(--color-secondary);
+    font-size: 0.82rem;
+    font-weight: 800;
+}
+
+.site-nav__logout {
+    margin: 0;
+}
+
+.site-nav__cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.55rem 1.1rem;
+    border: none;
+    border-radius: var(--radius-pill);
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+    color: #ffffff;
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 800;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.site-nav__cta:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 24px rgba(15, 107, 109, 0.3);
+}
+
+.site-nav__cta--ghost {
+    background: transparent;
+    color: var(--color-muted);
+}
+
+.site-nav__cta--ghost:hover {
+    background: var(--color-primary-soft);
+    color: var(--color-primary-dark);
+    box-shadow: none;
+}
+
+.site-nav__toggle-checkbox,
+.site-nav__toggle {
+    display: none;
+}
+
+@media (max-width: 991.98px) {
+    .site-nav__links {
+        gap: 0;
+    }
+
+    .site-nav__links a {
+        padding: 0.5rem 0.7rem;
+        font-size: 0.82rem;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .site-nav__pill {
+        flex-wrap: wrap;
+        padding: 0.65rem 0.9rem;
+    }
+
+    .site-nav__toggle {
+        display: grid;
+        width: 42px;
+        height: 42px;
+        place-items: center;
+        border-radius: 14px;
+        color: var(--color-secondary);
+        cursor: pointer;
+        font-size: 1.3rem;
+    }
+
+    .site-nav__links {
+        display: none;
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.35rem;
+        padding-top: 0.6rem;
+    }
+
+    .site-nav__links a {
+        justify-content: start;
+        padding: 0.7rem 1rem;
+    }
+
+    .site-nav__toggle-checkbox:checked ~ .site-nav__links {
+        display: flex;
+    }
+
+    .site-nav__actions {
+        margin-inline-start: 0;
+    }
+}
