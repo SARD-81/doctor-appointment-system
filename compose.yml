@@ -1,7 +1,6 @@
 services:
   db:
     image: postgres:16-alpine
-    container_name: doctor_appointment_db
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
@@ -21,7 +20,7 @@ services:
     build:
       context: .
       dockerfile: ./docker/development/Dockerfile
-    container_name: doctor_appointment_web
+    command: python manage.py runserver 0.0.0.0:8000
     restart: unless-stopped
     env_file:
       - .env

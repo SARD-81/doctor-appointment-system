@@ -9,7 +9,8 @@ WORKDIR /app
 # کپی و نصب مستقیم وابستگی‌ها بر اساس نسخه مشخص مخزن
 COPY requirements.txt /app/
 #RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install --no-cache-dir --default-timeout=1000 -i https://mirror-pypi.runflare.com/simple/ --trusted-host mirror-pypi.runflare.com -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
 
 COPY . /app/
 
