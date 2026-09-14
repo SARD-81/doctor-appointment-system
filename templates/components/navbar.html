@@ -21,7 +21,6 @@
         <ul class="site-nav__links" id="site-nav-menu">
             <li><a href="{% url 'home' %}">خانه</a></li>
             <li><a href="{% url 'doctors:list' %}">پزشکان</a></li>
-            <li><a href="{% url 'doctors:list' %}?specialty=">تخصص‌ها</a></li>
             {% if user.is_authenticated %}
                 <li>
                     <a href="{% url 'appointments:my_appointments' %}">
@@ -37,6 +36,13 @@
                 </li>
             {% endif %}
         </ul>
+
+        <button class="site-nav__theme-toggle" type="button" data-theme-toggle
+                aria-label="فعال‌کردن حالت تیره" aria-pressed="false"
+                title="تغییر پوسته رنگی">
+            <i class="bi bi-moon-stars" data-theme-icon aria-hidden="true"></i>
+            <span class="visually-hidden" data-theme-label>حالت تیره</span>
+        </button>
 
         <div class="site-nav__actions">
             {% if user.is_authenticated %}

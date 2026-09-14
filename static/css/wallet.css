@@ -4,8 +4,8 @@
     min-height: calc(100vh - 78px);
     padding: clamp(2.3rem, 5vw, 4.5rem) 0 6rem;
     background:
-        radial-gradient(circle at 86% 8%, rgba(85, 199, 192, 0.12), transparent 28%),
-        radial-gradient(circle at 10% 82%, rgba(23, 59, 87, 0.05), transparent 28%),
+        radial-gradient(circle at 86% 8%, var(--accent-12), transparent 28%),
+        radial-gradient(circle at 10% 82%, var(--secondary-05), transparent 28%),
         var(--color-bg);
 }
 
@@ -46,7 +46,7 @@
     padding: clamp(1.4rem, 3vw, 2rem);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
-    background: rgba(255, 255, 255, 0.96);
+    background: var(--surface-96);
     box-shadow: var(--shadow-md);
 }
 
@@ -110,7 +110,7 @@
     padding: clamp(1.3rem, 3vw, 2rem);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--surface-95);
     box-shadow: var(--shadow-md);
 }
 
@@ -157,7 +157,7 @@
 .wallet-topup__field input:focus {
     border-color: var(--color-primary);
     outline: none;
-    box-shadow: 0 0 0 3px rgba(15, 107, 109, 0.15);
+    box-shadow: 0 0 0 3px var(--primary-15);
 }
 
 .wallet-topup__presets {
@@ -210,7 +210,7 @@
     padding: 0.85rem 1rem;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--surface-90);
 }
 
 .wallet-tx__icon {

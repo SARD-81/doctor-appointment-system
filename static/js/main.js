@@ -2,6 +2,77 @@ const prefersReducedMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)"
 ).matches;
 
+const THEME_STORAGE_KEY = "doctor-appointment-theme";
+
+function applyTheme(theme) {
+    const isDark = theme === "dark";
+    document.documentElement.dataset.theme = isDark ? "dark" : "light";
+
+    const toggle = document.querySelector("[data-theme-toggle]");
+    if (toggle) {
+        toggle.setAttribute("aria-pressed", String(isDark));
+        toggle.setAttribute(
+            "aria-label",
+            isDark ? "فعال‌کردن حالت روشن" : "فعال‌کردن حالت تیره"
+        );
+
+        const label = toggle.querySelector("[data-theme-label]");
+        if (label) {
+            label.textContent = isDark ? "حالت روشن" : "حالت تیره";
+        }
+
+        const icon = toggle.querySelector("[data-theme-icon]");
+        if (icon) {
+            icon.className = isDark ? "bi bi-sun" : "bi bi-moon-stars";
+        }
+    }
+
+    const themeColor = document.querySelector('meta[name="theme-color"]');
+    if (themeColor) {
+        themeColor.setAttribute("content", isDark ? "#0b151e" : "#0f6b6d");
+    }
+}
+
+function initThemeToggle() {
+    const toggle = document.querySelector("[data-theme-toggle]");
+    const systemPreference = window.matchMedia("(prefers-color-scheme: dark)");
+
+    applyTheme(document.documentElement.dataset.theme);
+    document.documentElement.classList.add("theme-ready");
+
+    if (!toggle) {
+        return;
+    }
+
+    toggle.addEventListener("click", () => {
+        const nextTheme =
+            document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+        applyTheme(nextTheme);
+        try {
+            localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+        } catch (error) {
+            // Theme still applies for this page when browser storage is unavailable.
+        }
+    });
+
+    const syncSystemTheme = (event) => {
+        try {
+            if (localStorage.getItem(THEME_STORAGE_KEY)) {
+                return;
+            }
+        } catch (error) {
+            // Follow the live system preference when storage is unavailable.
+        }
+        applyTheme(event.matches ? "dark" : "light");
+    };
+
+    if (typeof systemPreference.addEventListener === "function") {
+        systemPreference.addEventListener("change", syncSystemTheme);
+    } else {
+        systemPreference.addListener(syncSystemTheme);
+    }
+}
+
 function initRevealMotion() {
     const items = document.querySelectorAll("[data-reveal]");
 
@@ -114,6 +185,7 @@ function initBootstrapMobileNav() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+    initThemeToggle();
     initRevealMotion();
     initHeaderState();
     initPasswordToggles();

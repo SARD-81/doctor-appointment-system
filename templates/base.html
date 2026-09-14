@@ -8,7 +8,27 @@
     <meta name="theme-color" content="#0f6b6d">
     <title>{% block title %}سامانه نوبت‌دهی پزشکان{% endblock %}</title>
 
-    <script>document.documentElement.classList.add("js");</script>
+    <script>
+        (() => {
+            const root = document.documentElement;
+            const storageKey = "doctor-appointment-theme";
+            let storedTheme = null;
+
+            try {
+                storedTheme = localStorage.getItem(storageKey);
+            } catch (error) {
+                storedTheme = null;
+            }
+
+            const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
+                ? "dark"
+                : "light";
+            root.dataset.theme = ["light", "dark"].includes(storedTheme)
+                ? storedTheme
+                : systemTheme;
+            root.classList.add("js");
+        })();
+    </script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

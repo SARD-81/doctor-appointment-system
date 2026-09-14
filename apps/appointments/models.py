@@ -4,6 +4,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import CheckConstraint, Q, UniqueConstraint
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 
@@ -45,7 +46,7 @@ class AppointmentSlot(models.Model):
     @property
     def is_available(self) -> bool:
         """بررسی داینامیک در دسترس بودن اسلات بدون نیاز به فیلد اضافی در دیتابیس."""
-        if not self.is_active:
+        if not self.is_active or self.starts_at <= timezone.now():
             return False
         return not hasattr(self, "appointment")
 

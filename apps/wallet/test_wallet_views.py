@@ -59,3 +59,14 @@ class TestWalletPage:
         assert tx is not None and tx.transaction_type == WalletTransaction.TOP_UP
         assert tx.amount == Decimal("100000")
         assert tx.balance_after == Decimal("851002.00")
+
+    @pytest.mark.parametrize("amount", ["0", "-1", "NaN", "Infinity", "10000000000"])
+    def test_invalid_top_up_is_rejected_with_feedback(self, client, funded_wallet, amount):
+        client.force_login(funded_wallet.user)
+
+        response = client.post(reverse("wallet:detail"), {"amount": amount}, follow=True)
+
+        funded_wallet.refresh_from_db()
+        assert funded_wallet.balance == Decimal("751002.00")
+        assert WalletTransaction.objects.count() == 0
+        assert any("مبلغ" in str(message) for message in response.context["messages"])

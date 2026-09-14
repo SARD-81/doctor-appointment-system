@@ -56,12 +56,14 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-          cache-dependency-path: requirements.txt
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt
+          python -m pip install -r requirements-dev.txt
 
       - name: Django system check
         run: python manage.py check
@@ -78,5 +80,32 @@ jobs:
       - name: Apply migrations
         run: python manage.py migrate --noinput
 
-      - name: Run tests
-        run: pytest -q
+      - name: Check production settings
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings.production
+          SECRET_KEY: ci-production-check-secret-key-with-more-than-fifty-characters
+          CACHE_URL: redis://127.0.0.1:6379/0
+          EMAIL_BACKEND: django.core.mail.backends.smtp.EmailBackend
+          EMAIL_HOST: smtp.example.test
+          SECURE_SSL_REDIRECT: "True"
+          SESSION_COOKIE_SECURE: "True"
+          CSRF_COOKIE_SECURE: "True"
+          SECURE_HSTS_SECONDS: "31536000"
+          SECURE_HSTS_INCLUDE_SUBDOMAINS: "True"
+          SECURE_HSTS_PRELOAD: "True"
+        run: python manage.py check --deploy
+
+      - name: Validate Compose contracts
+        run: |
+          cp .env.example .env
+          cp .env.production.example .env.production
+          docker compose config --quiet
+          docker compose -f compose.production.yml config --quiet
+
+      - name: Audit dependencies
+        run: pip-audit -r requirements-dev.txt --progress-spinner off
+
+      - name: Run tests with coverage
+        run: |
+          coverage run -m pytest -q
+          coverage report --fail-under=95

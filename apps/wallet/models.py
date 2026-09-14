@@ -44,7 +44,7 @@ class WalletTransaction(models.Model):
         "appointments.Appointment",
         null=True,
         blank=True,
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
     )
     transaction_type = models.CharField(max_length=32, choices=TRANSACTION_TYPES)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
@@ -57,5 +57,24 @@ class WalletTransaction(models.Model):
             models.CheckConstraint(
                 condition=models.Q(amount__gt=0),
                 name="wallet_transaction_amount_gt_zero",
-            )
+            ),
+            models.CheckConstraint(
+                condition=models.Q(balance_after__gte=0),
+                name="wallet_transaction_balance_after_gte_zero",
+            ),
+            models.CheckConstraint(
+                condition=(
+                    models.Q(transaction_type="TOP_UP", appointment__isnull=True)
+                    | models.Q(
+                        transaction_type="APPOINTMENT_PAYMENT",
+                        appointment__isnull=False,
+                    )
+                ),
+                name="wallet_transaction_reference_matches_type",
+            ),
+            models.UniqueConstraint(
+                fields=["appointment"],
+                condition=models.Q(transaction_type="APPOINTMENT_PAYMENT"),
+                name="unique_appointment_payment_transaction",
+            ),
         ]

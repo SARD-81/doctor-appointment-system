@@ -1,0 +1,7 @@
+-r requirements.txt
+
+coverage==7.16.0
+pip-audit==2.10.1
+pytest==9.0.3
+pytest-django==4.14.0
+ruff==0.16.5

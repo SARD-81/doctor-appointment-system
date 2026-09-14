@@ -15,7 +15,7 @@ This index preserves traceability for ADR-001 through ADR-013. Statuses describe
 | ADR-009 | Admin marks Appointment completed | Accepted baseline |
 | ADR-010 | Cancellation/refund out of baseline scope | Accepted baseline |
 | ADR-011 | Simulated wallet top-up | Accepted baseline |
-| ADR-012 | OTP channel/storage/lifecycle | Pending final confirmation |
+| ADR-012 | OTP channel/storage/lifecycle | Accepted implementation |
 | ADR-013 | Payment snapshot range and zero-fee visits | Accepted amendment (PR #52 review feedback) |
 
 ## ADR-001 — Doctor is independent from User
@@ -110,7 +110,7 @@ This clarification makes the already-agreed “at most one appointment payment p
 
 ## ADR-012 — OTP channel/storage/lifecycle
 
-**Status:** **Pending final confirmation / not fully frozen**
+**Status:** **Accepted implementation**
 
 ### Original open questions
 
@@ -122,9 +122,9 @@ This clarification makes the already-agreed “at most one appointment payment p
 - Resend policy?
 - One-time consumption?
 
-### Current implementation evidence
+### Accepted implementation contract
 
-The current `feature/account-authentication` branch uses:
+The integrated implementation uses:
 
 - Email delivery through Django's email backend.
 - Django Cache API for OTP, cooldown, attempt, and rate-limit state.
@@ -136,21 +136,16 @@ The current `feature/account-authentication` branch uses:
 - Maximum 5 requests per 15-minute window.
 - One-time consumption by deleting OTP state after successful verification.
 - A new OTP replaces the previous cached OTP value for the same email.
-- Registration/OTP/login forms and a custom email authentication backend are now present as additional implementation evidence, but Issue #15 remains the backend-contract review gate.
-
-### Evidence still requiring review before Accepted/Frozen
-
-Issue #15 remains open and still governs final backend/forms/authentication-contract acceptance, including correct email authentication behavior, inactive-user rejection, form validation/password handling, and the completed OTP lifecycle test suite.
-
-Therefore the implementation direction is documented, but ADR-012 is not silently promoted to Accepted/Frozen until Issue #15 review/merge or explicit team confirmation.
+- Registration/OTP/login forms and a case-insensitive email authentication backend.
+- Redis-backed shared cache in production so OTP and throttling state are consistent across Gunicorn workers.
 
 ### ERD consequence
 
-No `OTPRequest` entity is part of the baseline ERD while cache-backed persistence remains the implementation direction. If the final decision changes to DB-backed persistence, the ERD and related UML must be updated through an explicit ADR change.
+No `OTPRequest` entity is part of the baseline ERD because persistence is cache-backed. If a future decision changes to database-backed persistence, the ERD and related UML must be updated through an explicit ADR change.
 
 ## ADR-013 — Payment snapshot decimal range and zero-fee visits
 
-**Status:** Accepted amendment recorded from PR #52 review feedback; pending team re-review at merge.
+**Status:** Accepted amendment.
 
 **Decision:**
 

@@ -1,6 +1,7 @@
 # apps/accounts/tests/test_auth_backend.py
 import pytest
 from django.contrib.auth import authenticate, get_user_model
+from django.db import IntegrityError
 
 from apps.accounts.backends import EmailAuthBackend
 from apps.accounts.forms import UserRegisterForm, VerifyOTPForm
@@ -146,6 +147,22 @@ def test_user_register_form_duplicate_email():
     )
     assert not form.is_valid()
     assert "این ایمیل قبلاً ثبت‌ نام کرده است." in form.errors["email"]
+
+
+@pytest.mark.django_db(transaction=True)
+def test_database_rejects_case_insensitive_duplicate_email():
+    User.objects.create_user(
+        username="first_case_user",
+        email="CaseDuplicate@Example.com",
+        password="Password123!",
+    )
+
+    with pytest.raises(IntegrityError):
+        User.objects.create_user(
+            username="second_case_user",
+            email="caseduplicate@example.com",
+            password="Password123!",
+        )
 
 
 @pytest.mark.django_db

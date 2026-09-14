@@ -1,4 +1,4 @@
-from django.db.models import Avg, Count
+from django.db.models import Avg, Count, Q
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 
@@ -50,7 +50,9 @@ def doctor_list_view(request):
     specialties = Specialty.objects.all()
 
     if query:
-        doctors = doctors.filter(full_name__icontains=query)
+        doctors = doctors.filter(
+            Q(full_name__icontains=query) | Q(specialty__name__icontains=query)
+        )
 
     selected_specialty_id = None
     specialty_filter_invalid = False

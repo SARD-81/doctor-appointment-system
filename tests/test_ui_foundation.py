@@ -1,4 +1,6 @@
+import re
 from importlib import reload
+from pathlib import Path
 
 from django.contrib.messages import constants as message_constants
 from django.contrib.messages.storage.base import Message
@@ -7,6 +9,8 @@ from django.test import Client, override_settings
 from django.urls import clear_url_caches
 
 from config import urls as project_urls
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 
 def reload_project_urls():
@@ -90,3 +94,39 @@ def test_message_extra_tags_do_not_override_error_severity():
 
     assert "alert-danger" in html
     assert "alert-info" not in html
+
+
+def test_theme_is_initialized_before_styles_and_toggle_is_rendered():
+    response = Client().get("/")
+    html = response.content.decode("utf-8")
+
+    assert "localStorage.getItem(storageKey)" in html
+    assert "prefers-color-scheme: dark" in html
+    assert html.index("doctor-appointment-theme") < html.index("css/variables.css")
+    assert "data-theme-toggle" in html
+    assert 'aria-pressed="false"' in html
+
+
+def test_component_styles_use_theme_tokens_instead_of_hardcoded_colors():
+    color_literal = re.compile(r"#[0-9a-fA-F]{3,8}\b|rgba?\(")
+    violations = []
+
+    for stylesheet in (PROJECT_ROOT / "static" / "css").glob("*.css"):
+        if stylesheet.name == "variables.css":
+            continue
+        for line_number, line in enumerate(stylesheet.read_text().splitlines(), start=1):
+            if color_literal.search(line):
+                violations.append(f"{stylesheet.name}:{line_number}")
+
+    assert violations == []
+
+
+def test_dark_theme_defines_the_core_surface_and_text_tokens():
+    tokens = (PROJECT_ROOT / "static" / "css" / "variables.css").read_text()
+
+    assert ':root[data-theme="dark"]' in tokens
+    assert "--color-bg:" in tokens
+    assert "--color-surface:" in tokens
+    assert "--color-text:" in tokens
+    assert "--color-muted:" in tokens
+    assert "--color-border:" in tokens
