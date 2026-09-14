@@ -1,101 +1,59 @@
 # Doctor Appointment System
 
-A production-ready doctor appointment booking system built with Django, PostgreSQL, and Docker.
+Production-ready doctor appointment booking system built with Django, PostgreSQL and Docker, featuring OTP authentication, wallet payments, reviews, scheduling, and Google OAuth.
 
-## Project Status
+## Docker development
 
-This project is currently under active development as part of a software engineering bootcamp team project.
+Create the local environment file and start the development services:
 
-## Core Features
+```bash
+cp .env.example .env
+docker compose up -d --build
+docker compose exec web python manage.py migrate
+docker compose exec web python manage.py createsuperuser
+```
 
-- Doctor and specialty management
-- Appointment scheduling and booking
-- Wallet-based payments
-- Email OTP authentication
-- Doctor search
-- Ratings and reviews
-- Google OAuth
-- Production-ready Docker setup
+The application is available at `http://localhost:8000`.
 
-## Tech Stack
+Useful commands:
 
-- Python 3.12
-- Django 5.2
-- PostgreSQL 16
-- Docker & Docker Compose
-- pytest
-- Ruff
+```bash
+docker compose logs -f web
+docker compose ps
+docker compose down
+```
 
-## Team
+Use `docker compose down -v` only when you intentionally want to delete the local PostgreSQL volume and its data.
 
-Three-person software engineering team.
+## Docker production
 
-Detailed setup and deployment documentation will be added as development progresses.
-##  Quick Start & Running
+Create a production environment file from the committed template and replace all placeholder values before deployment:
 
-Choose your target environment to start the application:
+```bash
+cp .env.production.example .env.production
+```
 
-### Option 1: Development Environment (Recommended for Local Dev)
+Build the production image and prepare database/static assets:
 
-Runs Django with hot-reloading enabled via `compose.yml`.
+```bash
+docker compose -f compose.production.yml build
+docker compose -f compose.production.yml run --rm web python manage.py migrate --noinput
+docker compose -f compose.production.yml run --rm web python manage.py collectstatic --noinput
+docker compose -f compose.production.yml up -d
+docker compose -f compose.production.yml ps
+docker compose -f compose.production.yml logs -f nginx
+```
 
-1. **Clone the repository and enter the directory:**
-   ```bash
-   git clone <repository-url>
-   cd doctor-appointment-system
-   ```
+The production stack exposes Nginx on port 80. PostgreSQL is kept on the internal Compose network and is persisted in the `postgres_data_prod` volume. Production deployment requires real secret values, an appropriate `ALLOWED_HOSTS`, and HTTPS-aware secure-cookie/HSTS settings.
 
-2. **Setup environment variables:**
-   ```bash
-   cp .env.example .env
-   # Ensure POSTGRES_* and SECRET_KEY are properly configured
-   ```
+## Verification
 
-3. **Build and start services:**
-   ```bash
-   docker compose up -d --build
-   ```
+Before opening or merging a Docker PR, run the standard Django checks and the relevant Compose validation:
 
-4. **Apply database migrations:**
-   ```bash
-   docker compose exec web python manage.py migrate
-   ```
+```bash
+python manage.py check
+python manage.py check --deploy
+docker compose -f compose.production.yml config
+```
 
-5. **Create an admin account:**
-   ```bash
-   docker compose exec web python manage.py createsuperuser
-   ```
-
-6. **Open in browser:**
-   - App: [http://localhost:8000](http://localhost:8000)
-   - Admin Panel: [http://localhost:8000/admin](http://localhost:8000/admin)
-
----
-
-### Option 2: Production Environment
-
-Runs an optimized build using **Gunicorn** via `compose.production.yml`.
-
-1. **Setup production environment variables:**
-   ```bash
-   cp .env.production.example .env.production
-   # Ensure DEBUG=False and strong credentials are set
-   ```
-
-2. **Build and start production containers:**
-   ```bash
-   docker compose -f compose.production.yml up -d --build
-   ```
-
-3. **Run migrations and collect static assets:**
-   ```bash
-   docker compose -f compose.production.yml exec web python manage.py migrate
-   docker compose -f compose.production.yml exec web python manage.py collectstatic --noinput
-   ```
-
-4. **Verify container health and logs:**
-   ```bash
-   docker compose -f compose.production.yml ps
-   docker compose -f compose.production.yml logs -f web
-   ```
-
+Docker runtime validation must be reported separately from the standard CI quality job if Docker is unavailable in the local environment.
