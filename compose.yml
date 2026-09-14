@@ -37,22 +37,4 @@ services:
 
 volumes:
   postgres_data:
-  web:
-    build:
-      context: .
-      dockerfile: docker/development/Dockerfile
-    command: python manage.py runserver 0.0.0.0:8000
-    volumes:
-      - .:/app
-    ports:
-      - "8000:8000"
-    environment:
-      - DEBUG=True
-      - DJANGO_SETTINGS_MODULE=config.settings.development
-    depends_on:
-      db:
-        condition: service_healthy
-
-volumes:
-  postgres_data:
 

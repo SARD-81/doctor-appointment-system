@@ -1,16 +1,14 @@
 from pathlib import Path
-import environ
-BASE_DIR = Path(__file__).resolve().parent.parent.parent 
-env = environ.Env(
-    DEBUG=(bool, False)
-)
-prod_env = BASE_DIR / ".env.production"
-dev_env = BASE_DIR / ".env"
 
-if prod_env.exists():
-    environ.Env.read_env(prod_env, overwrite=False)
-elif dev_env.exists():
-    environ.Env.read_env(dev_env, overwrite=False)
+import environ
+
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
+env = environ.Env(DEBUG=(bool, False))
+
+env_file = BASE_DIR / ".env"
+if env_file.exists():
+    environ.Env.read_env(env_file, overwrite=False)
 
 SECRET_KEY = env("SECRET_KEY")
 DEBUG = env.bool("DEBUG", default=False)

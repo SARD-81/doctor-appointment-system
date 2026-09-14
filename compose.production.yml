@@ -1,13 +1,13 @@
 services:
   db:
-    image: postgres:16-alpine    
+    image: postgres:16-alpine
     restart: unless-stopped
     env_file:
       - .env.production
     volumes:
       - postgres_data_prod:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -17,8 +17,12 @@ services:
   web:
     build:
       context: .
-      dockerfile: docker/production/Dockerfile    
-    command: gunicorn --bind 0.0.0.0:8000 config.wsgi:application
+      dockerfile: ./docker/development/Dockerfile
+    command: >
+      sh -c "python manage.py collectstatic --noinput &&
+             gunicorn --bind 0.0.0.0:8000 --workers 3 config.wsgi:application"
+    healthcheck:
+      disable: true
     restart: unless-stopped
     env_file:
       - .env.production
@@ -43,7 +47,8 @@ services:
       - static_volume:/app/staticfiles:ro
       - media_volume:/app/media:ro
     depends_on:
-      - web
+      web:
+        condition: service_started
     networks:
       - prod_network
 
@@ -55,3 +60,4 @@ volumes:
 networks:
   prod_network:
     driver: bridge
+
