@@ -1,0 +1,63 @@
+<article class="doctor-card">
+    <div class="doctor-card__top">
+        <div class="doctor-card__avatar" aria-hidden="true">
+            {% if image_url %}
+                <img src="{{ image_url }}" alt="">
+            {% else %}
+                <span>{{ initials|default:"د" }}</span>
+            {% endif %}
+        </div>
+
+        <div class="doctor-card__identity">
+            <div class="doctor-card__title-row">
+                <h3>{{ name }}</h3>
+                {% if verified %}
+                    <span class="doctor-card__verified" title="پروفایل تأیید شده">
+                        <i class="bi bi-patch-check-fill"></i>
+                    </span>
+                {% endif %}
+            </div>
+
+            <p>{{ specialty }}</p>
+
+            {% if rating %}
+                {% include "components/rating.html" with rating=rating reviews_count=reviews_count %}
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="doctor-card__meta">
+        {% if fee %}
+            <div class="doctor-card__meta-item">
+                <span>هزینه ویزیت</span>
+                <strong>{{ fee }}</strong>
+            </div>
+        {% endif %}
+
+        {% if next_slot %}
+            <div class="doctor-card__meta-item">
+                <span>اولین نوبت آزاد</span>
+                <strong class="doctor-card__available">
+                    <i class="bi bi-calendar2-check"></i>
+                    {{ next_slot }}
+                </strong>
+            </div>
+        {% endif %}
+    </div>
+
+    {% if profile_url or booking_url %}
+        <div class="doctor-card__actions">
+            {% if profile_url %}
+                <a class="btn btn-ghost app-btn app-btn--sm" href="{{ profile_url }}">
+                    مشاهده پروفایل
+                </a>
+            {% endif %}
+
+            {% if booking_url %}
+                <a class="btn btn-primary app-btn app-btn--sm" href="{{ booking_url }}">
+                    دریافت نوبت
+                </a>
+            {% endif %}
+        </div>
+    {% endif %}
+</article>

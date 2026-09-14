@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+
+{% block title %}نوبت‌دهی آنلاین پزشکان{% endblock %}
+
+{% block meta_description %}
+جستجوی پزشک، مشاهده زمان‌های در دسترس و رزرو نوبت به‌صورت آنلاین.
+{% endblock %}
+
+{% block content %}
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-7" data-reveal>
+                <span class="eyebrow">
+                    <i class="bi bi-heart-pulse"></i>
+                    تجربه ساده‌تر برای دریافت نوبت
+                </span>
+
+                <h1 class="hero-title">
+                    نوبت پزشک،
+                    <span>بدون تماس و انتظار.</span>
+                </h1>
+
+                <p class="hero-copy">
+                    پزشک موردنظر را پیدا کنید، زمان مناسب را انتخاب کنید و
+                    فرایند رزرو را آنلاین انجام دهید.
+                </p>
+
+                <form class="search-shell" action="{% url 'doctors:list' %}" method="get"
+                      role="search" aria-label="جستجوی پزشک">
+                    <div class="search-shell__icon">
+                        <i class="bi bi-search" aria-hidden="true"></i>
+                    </div>
+
+                    <div class="search-shell__content">
+                        <label class="search-shell__label" for="hero-search">
+                            جستجوی پزشک یا تخصص
+                        </label>
+                        <input class="search-shell__input" id="hero-search" type="search"
+                               name="q" placeholder="مثال: قلب و عروق، دکتر احمدی..."
+                               autocomplete="off">
+                    </div>
+
+                    <button class="btn btn-primary app-btn" type="submit">
+                        جستجو
+                    </button>
+                </form>
+
+                <div class="hero-features">
+                    <div class="hero-feature">
+                        <i class="bi bi-search-heart"></i>
+                        <span>جستجوی سریع</span>
+                    </div>
+                    <div class="hero-feature">
+                        <i class="bi bi-calendar2-check"></i>
+                        <span>انتخاب زمان مناسب</span>
+                    </div>
+                    <div class="hero-feature">
+                        <i class="bi bi-shield-check"></i>
+                        <span>فرایند امن و شفاف</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="hero-visual d-none d-lg-block" aria-hidden="true" data-reveal>
+                    <div class="hero-visual__glow"></div>
+
+                    <div class="floating-card floating-card--doctor">
+                        <div class="avatar-placeholder">
+                            <i class="bi bi-person"></i>
+                        </div>
+                        <div>
+                            <strong>انتخاب پزشک</strong>
+                            <span>بر اساس نام و تخصص</span>
+                        </div>
+                    </div>
+
+                    <div class="floating-card floating-card--time">
+                        <i class="bi bi-clock-history"></i>
+                        <div>
+                            <strong>زمان‌های خالی</strong>
+                            <span>مشاهده و انتخاب آنلاین</span>
+                        </div>
+                    </div>
+
+                    <div class="visual-center">
+                        <div class="visual-center__icon">
+                            <i class="bi bi-calendar2-heart"></i>
+                        </div>
+                        <span>رزرو نوبت</span>
+                        <strong>ساده، سریع، آنلاین</strong>
+                    </div>
+
+                    <div class="visual-orbit visual-orbit--one"></div>
+                    <div class="visual-orbit visual-orbit--two"></div>
+                </div>
+
+                <div class="hero-mobile-journey d-lg-none" data-reveal aria-label="خلاصه مسیر رزرو">
+                    <div class="hero-mobile-journey__head">
+                        <span>مسیر رزرو</span>
+                        <small>سه قدم کوتاه</small>
+                    </div>
+
+                    <div class="hero-mobile-journey__steps">
+                        <div class="hero-mobile-journey__step">
+                            <span class="hero-mobile-journey__icon">
+                                <i class="bi bi-person-search"></i>
+                            </span>
+                            <strong>پزشک</strong>
+                        </div>
+
+                        <div class="hero-mobile-journey__step">
+                            <span class="hero-mobile-journey__icon">
+                                <i class="bi bi-calendar3"></i>
+                            </span>
+                            <strong>زمان</strong>
+                        </div>
+
+                        <div class="hero-mobile-journey__step hero-mobile-journey__step--active">
+                            <span class="hero-mobile-journey__icon">
+                                <i class="bi bi-check2-circle"></i>
+                            </span>
+                            <strong>تأیید</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-space">
+    <div class="container">
+        <div class="section-heading" data-reveal>
+            <span class="eyebrow">مسیر رزرو</span>
+            <h2>سه مرحله تا نوبت شما</h2>
+            <p>فرایند اصلی سامانه طوری طراحی شده که بدون پیچیدگی به نتیجه برسید.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4" data-reveal>
+                <article class="step-card">
+                    <span class="step-card__number">01</span>
+                    <div class="step-card__icon"><i class="bi bi-search"></i></div>
+                    <h3>پزشک را پیدا کنید</h3>
+                    <p>بر اساس نام پزشک یا تخصص موردنظر جستجو کنید.</p>
+                </article>
+            </div>
+
+            <div class="col-md-4" data-reveal>
+                <article class="step-card">
+                    <span class="step-card__number">02</span>
+                    <div class="step-card__icon"><i class="bi bi-calendar3"></i></div>
+                    <h3>زمان مناسب را انتخاب کنید</h3>
+                    <p>زمان‌های آزاد پزشک را ببینید و گزینه مناسب را انتخاب کنید.</p>
+                </article>
+            </div>
+
+            <div class="col-md-4" data-reveal>
+                <article class="step-card">
+                    <span class="step-card__number">03</span>
+                    <div class="step-card__icon"><i class="bi bi-check2-circle"></i></div>
+                    <h3>رزرو را نهایی کنید</h3>
+                    <p>پس از پرداخت، تأیید رزرو برای شما ارسال می‌شود.</p>
+                </article>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-space section-space--soft">
+    <div class="container">
+        <div class="feature-panel" data-reveal>
+            <div class="feature-panel__content">
+                <span class="eyebrow">طراحی برای تجربه بهتر</span>
+                <h2>همه چیز در یک مسیر روشن و قابل اعتماد</h2>
+                <p>
+                    ساختار رابط کاربری از ابتدا برای توسعه مرحله‌ای قابلیت‌های
+                    جستجو، نوبت‌دهی، کیف پول و نظرات آماده شده است.
+                </p>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <i class="bi bi-person-check"></i>
+                    <span>پروفایل پزشکان</span>
+                </div>
+                <div class="feature-item">
+                    <i class="bi bi-calendar-week"></i>
+                    <span>مدیریت نوبت</span>
+                </div>
+                <div class="feature-item">
+                    <i class="bi bi-wallet2"></i>
+                    <span>پرداخت با کیف پول</span>
+                </div>
+                <div class="feature-item">
+                    <i class="bi bi-star"></i>
+                    <span>امتیاز و نظر</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-space">
+    <div class="container">
+        <div class="cta-panel" data-reveal>
+            <div>
+                <span class="eyebrow eyebrow--light">شروع ساده</span>
+                <h2>برای پیدا کردن پزشک مناسب آماده‌اید؟</h2>
+                <p>لیست کامل پزشکان و تخصص‌های فعال را همین حالا ببینید.</p>
+            </div>
+            <a class="btn btn-light app-btn app-btn--light" href="{% url 'doctors:list' %}">
+                مشاهده پزشکان
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

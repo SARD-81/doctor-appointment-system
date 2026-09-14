@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}تأیید رزرو نوبت | نوبت پزشک{% endblock %}
+{% block meta_description %}نوبت شما با موفقیت ثبت شد{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/booking.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="booking-confirm">
+    <div class="container">
+        <div class="booking-confirm__card" data-reveal>
+            <div class="booking-confirm__icon" aria-hidden="true">
+                <i class="bi bi-check-lg"></i>
+            </div>
+
+            <span class="section-eyebrow">تأیید رزرو</span>
+            <h1>نوبت شما با موفقیت ثبت شد</h1>
+            <p class="booking-confirm__lead">
+                جزئیات نوبت و رسید پرداخت برای شما ثبت شد و ایمیل تأیید رزرو برایتان ارسال شد.
+            </p>
+
+            <span class="booking-confirm__code">
+                <i class="bi bi-upc-scan" aria-hidden="true"></i>
+                کد پیگیری: {{ appointment.pk }}
+            </span>
+
+            <div class="booking-detail-grid">
+                <div>
+                    <span>پزشک</span>
+                    <strong>{{ appointment.slot.doctor.full_name }}</strong>
+                </div>
+                <div>
+                    <span>زمان مراجعه</span>
+                    <strong>{{ appointment.slot.starts_at|date:"Y/m/d - H:i" }}</strong>
+                </div>
+                <div>
+                    <span>مبلغ پرداخت‌شده</span>
+                    <strong>{{ appointment.amount_paid }} تومان</strong>
+                </div>
+                <div>
+                    <span>وضعیت نوبت</span>
+                    <strong>تأیید شده</strong>
+                </div>
+            </div>
+
+            <div class="booking-confirm__actions">
+                <a class="btn btn-primary app-btn" href="{% url 'doctors:list' %}">
+                    بازگشت به پزشکان
+                </a>
+                <a class="btn btn-ghost app-btn" href="{% url 'wallet:detail' %}">
+                    مشاهده کیف پول
+                </a>
+            </div>
+
+            <p class="booking-confirm__note">
+                لطفاً ده دقیقه قبل از زمان مراجعه در مطب حاضر باشید. جزئیات کامل رزرو در ایمیل ثبت‌شده‌تان موجود است.
+            </p>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/navbar.css' %}">
+
+<nav class="site-nav">
+    <div class="site-nav__pill">
+        <a class="site-nav__brand" href="{% url 'home' %}" aria-label="صفحه اصلی نوبت پزشک">
+            <span class="site-nav__logo" aria-hidden="true">
+                <i class="bi bi-heart-pulse-fill"></i>
+            </span>
+            <span class="site-nav__title">
+                <strong>نوبت پزشک</strong>
+                <small>رزرو آنلاین و ساده</small>
+            </span>
+        </a>
+
+        <input class="site-nav__toggle-checkbox" type="checkbox" id="site-nav-toggle">
+        <label class="site-nav__toggle" for="site-nav-toggle" aria-label="باز کردن منو" aria-expanded="false">
+            <i class="bi bi-list" aria-hidden="true"></i>
+        </label>
+
+        <ul class="site-nav__links" id="site-nav-menu">
+            <li><a href="{% url 'home' %}">خانه</a></li>
+            <li><a href="{% url 'doctors:list' %}">پزشکان</a></li>
+            {% if user.is_authenticated %}
+                <li>
+                    <a href="{% url 'appointments:my_appointments' %}">
+                        <i class="bi bi-calendar2-check" aria-hidden="true"></i>
+                        نوبت‌های من
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'wallet:detail' %}">
+                        <i class="bi bi-wallet2" aria-hidden="true"></i>
+                        کیف پول
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+
+        <button class="site-nav__theme-toggle" type="button" data-theme-toggle
+                aria-label="فعال‌کردن حالت تیره" aria-pressed="false"
+                title="تغییر پوسته رنگی">
+            <i class="bi bi-moon-stars" data-theme-icon aria-hidden="true"></i>
+            <span class="visually-hidden" data-theme-label>حالت تیره</span>
+        </button>
+
+        <div class="site-nav__actions">
+            {% if user.is_authenticated %}
+                <span class="site-nav__user">
+                    <i class="bi bi-person-circle" aria-hidden="true"></i>
+                    {{ user.get_full_name|default:user.username }}
+                </span>
+                <form method="post" action="{% url 'accounts:logout' %}" class="site-nav__logout">
+                    {% csrf_token %}
+                    <button type="submit" class="site-nav__cta site-nav__cta--ghost">خروج</button>
+                </form>
+            {% else %}
+                <a class="site-nav__cta site-nav__cta--ghost" href="{% url 'accounts:login' %}">ورود</a>
+                <a class="site-nav__cta" href="{% url 'accounts:register' %}">ساخت حساب</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>

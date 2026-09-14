@@ -1,0 +1,17 @@
+#!/bin/sh
+
+# Prevent accidental direct pushes to permanent integration/release branches.
+while read local_ref local_sha remote_ref remote_sha
+do
+    case "$remote_ref" in
+        refs/heads/main|refs/heads/develop)
+            echo ""
+            echo "ERROR: Direct pushes to main/develop are not allowed."
+            echo "Create a task branch and open a Pull Request instead."
+            echo ""
+            exit 1
+            ;;
+    esac
+done
+
+exit 0

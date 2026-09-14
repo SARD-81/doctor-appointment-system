@@ -1,0 +1,41 @@
+{% if field %}
+<div class="app-field {% if field.errors %}app-field--invalid{% endif %}">
+    <div class="app-field__label-row">
+        <label class="app-field__label" for="{{ field.id_for_label }}">
+            {{ field.label }}
+            {% if field.field.required %}<span class="app-field__required" aria-hidden="true">*</span>{% endif %}
+        </label>
+
+        {% if optional_label %}
+            <span class="app-field__optional">{{ optional_label }}</span>
+        {% endif %}
+    </div>
+
+    <div class="app-field__control {% if password_toggle %}app-field__control--password{% endif %}">
+        {{ field }}
+        {% if password_toggle %}
+            <button
+                type="button"
+                class="password-toggle"
+                data-password-toggle="{{ field.id_for_label }}"
+                aria-label="نمایش رمز عبور"
+                aria-pressed="false"
+            >
+                <i class="bi bi-eye" aria-hidden="true"></i>
+            </button>
+        {% endif %}
+    </div>
+
+    {% if field.help_text %}
+        <div class="app-field__help">{{ field.help_text|safe }}</div>
+    {% endif %}
+
+    {% if field.errors %}
+        <div class="app-field__errors" role="alert">
+            {% for error in field.errors %}
+                <span><i class="bi bi-exclamation-circle"></i>{{ error }}</span>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endif %}

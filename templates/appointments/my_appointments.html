@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}نوبت‌های من | نوبت پزشک{% endblock %}
+{% block meta_description %}مشاهده نوبت‌های ثبت‌شده و سوابق ویزیت{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/my-appointments.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="my-appointments-page">
+    <div class="container">
+        <header class="my-appointments-page__header" data-reveal>
+            <span class="section-eyebrow">حساب کاربری</span>
+            <h1>نوبت‌های من</h1>
+            <p>تمام نوبت‌های ثبت‌شده و وضعیت آخرین ویزیت‌های خود را از اینجا پیگیری کنید.</p>
+        </header>
+
+        {% if appointments %}
+            <div class="my-appointments-list">
+                {% for appointment in appointments %}
+                    <article class="my-appointment-card" data-reveal>
+                        <div class="my-appointment-card__top">
+                            <span class="my-appointment-card__code">کد پیگیری #{{ appointment.pk }}</span>
+                            {% if appointment.status == 'COMPLETED' %}
+                                <span class="my-appointment-card__status my-appointment-card__status--completed">
+                                    <i class="bi bi-check2-circle" aria-hidden="true"></i>
+                                    تکمیل‌شده
+                                </span>
+                            {% else %}
+                                <span class="my-appointment-card__status my-appointment-card__status--confirmed">
+                                    <i class="bi bi-calendar2-check" aria-hidden="true"></i>
+                                    تأییدشده
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <div class="my-appointment-card__main">
+                            <div class="my-appointment-card__avatar" aria-hidden="true">
+                                {{ appointment.slot.doctor.full_name|slice:":1"|default:"د" }}
+                            </div>
+                            <div>
+                                <h2>{{ appointment.slot.doctor.full_name }}</h2>
+                                <p>{{ appointment.slot.doctor.specialty.name }}</p>
+                            </div>
+                        </div>
+
+                        <div class="my-appointment-card__details">
+                            <div>
+                                <span><i class="bi bi-calendar3" aria-hidden="true"></i> زمان مراجعه</span>
+                                <strong>{{ appointment.slot.starts_at|date:"Y/m/d - H:i" }}</strong>
+                            </div>
+                            <div>
+                                <span><i class="bi bi-wallet2" aria-hidden="true"></i> مبلغ پرداختی</span>
+                                <strong>{{ appointment.amount_paid }} تومان</strong>
+                            </div>
+                        </div>
+
+                        {% if appointment.status == 'COMPLETED' %}
+                            {% if appointment.review %}
+                                <div class="my-appointment-card__submitted-review">
+                                    <div class="my-appointment-card__submitted-review-head">
+                                        <span class="star-display" aria-label="امتیاز شما {{ appointment.review.rating }} از ۵">
+                                            {% for i in "12345" %}
+                                                {% if forloop.counter <= appointment.review.rating %}
+                                                    <i class="bi bi-star-fill" aria-hidden="true"></i>
+                                                {% else %}
+                                                    <i class="bi bi-star" aria-hidden="true"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </span>
+                                        <span class="my-appointment-card__submitted-review-date">
+                                            ثبت‌شده در {{ appointment.review.created_at|date:"Y/m/d" }}
+                                        </span>
+                                    </div>
+                                    {% if appointment.review.comment %}
+                                        <p class="my-appointment-card__submitted-review-comment">
+                                            «{{ appointment.review.comment }}»
+                                        </p>
+                                    {% endif %}
+                                    <p class="my-appointment-card__note">
+                                        <i class="bi bi-patch-check" aria-hidden="true"></i>
+                                        امتیاز شما: {{ appointment.review.rating }} از ۵ — ممنون از بازخوردتان
+                                    </p>
+                                </div>
+                            {% else %}
+                                <form
+                                    class="my-appointment-card__review"
+                                    method="post"
+                                    action="{% url 'reviews:create' appointment.pk %}"
+                                >
+                                    {% csrf_token %}
+
+                                    <span class="my-appointment-card__review-hint">
+                                        <i class="bi bi-stars" aria-hidden="true"></i>
+                                        تجربه این ویزیت را ثبت کنید
+                                        <small>(فقط یک بار قابل ثبت است)</small>
+                                    </span>
+
+                                    <fieldset class="star-rating">
+                                        <legend class="visually-hidden">امتیاز شما به این ویزیت</legend>
+                                        <div class="star-rating__stars">
+                                            <input
+                                                type="radio"
+                                                id="rate-{{ appointment.pk }}-5"
+                                                name="rating"
+                                                value="5"
+                                                required
+                                            >
+                                            <label for="rate-{{ appointment.pk }}-5" title="عالی" aria-label="۵ از ۵ — عالی">
+                                                <i class="bi bi-star-fill" aria-hidden="true"></i>
+                                            </label>
+                                            <input
+                                                type="radio"
+                                                id="rate-{{ appointment.pk }}-4"
+                                                name="rating"
+                                                value="4"
+                                            >
+                                            <label for="rate-{{ appointment.pk }}-4" title="خوب" aria-label="۴ از ۵ — خوب">
+                                                <i class="bi bi-star-fill" aria-hidden="true"></i>
+                                            </label>
+                                            <input
+                                                type="radio"
+                                                id="rate-{{ appointment.pk }}-3"
+                                                name="rating"
+                                                value="3"
+                                            >
+                                            <label for="rate-{{ appointment.pk }}-3" title="متوسط" aria-label="۳ از ۵ — متوسط">
+                                                <i class="bi bi-star-fill" aria-hidden="true"></i>
+                                            </label>
+                                            <input
+                                                type="radio"
+                                                id="rate-{{ appointment.pk }}-2"
+                                                name="rating"
+                                                value="2"
+                                            >
+                                            <label for="rate-{{ appointment.pk }}-2" title="ضعیف" aria-label="۲ از ۵ — ضعیف">
+                                                <i class="bi bi-star-fill" aria-hidden="true"></i>
+                                            </label>
+                                            <input
+                                                type="radio"
+                                                id="rate-{{ appointment.pk }}-1"
+                                                name="rating"
+                                                value="1"
+                                            >
+                                            <label for="rate-{{ appointment.pk }}-1" title="خیلی ضعیف" aria-label="۱ از ۵ — خیلی ضعیف">
+                                                <i class="bi bi-star-fill" aria-hidden="true"></i>
+                                            </label>
+                                        </div>
+                                        <span class="star-rating__hint" aria-hidden="true">روی ستاره‌ها کلیک کنید</span>
+                                    </fieldset>
+
+                                    <div class="app-field">
+                                        <label class="app-field__label" for="comment-{{ appointment.pk }}">
+                                            نظر شما
+                                            <span class="app-field__optional">اختیاری</span>
+                                        </label>
+                                        <div class="app-field__control">
+                                            <textarea
+                                                id="comment-{{ appointment.pk }}"
+                                                name="comment"
+                                                maxlength="2000"
+                                                placeholder="مثلاً: برخورد پزشک حرفه‌ای بود و مطب به‌موقع پذیرایی کرد…"
+                                            ></textarea>
+                                        </div>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary app-btn">
+                                        <i class="bi bi-send" aria-hidden="true"></i>
+                                        ثبت امتیاز و نظر
+                                    </button>
+                                </form>
+                            {% endif %}
+                        {% else %}
+                            <p class="my-appointment-card__note">
+                                <i class="bi bi-info-circle" aria-hidden="true"></i>
+                                نوبت شما ثبت شده است. لطفاً چند دقیقه پیش از زمان مراجعه در مطب حاضر باشید.
+                            </p>
+                        {% endif %}
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="my-appointments-empty" data-reveal>
+                <span class="my-appointments-empty__icon" aria-hidden="true"><i class="bi bi-calendar2-x"></i></span>
+                <h2>هنوز نوبتی رزرو نکرده‌اید</h2>
+                <p>با انتخاب پزشک و زمان مناسب، اولین نوبت خود را ثبت کنید.</p>
+                <a class="btn btn-primary app-btn" href="{% url 'doctors:list' %}">
+                    <i class="bi bi-search" aria-hidden="true"></i>
+                    مشاهده پزشکان
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
