@@ -48,7 +48,7 @@
                     {% csrf_token %}
                     <div class="wallet-topup__field">
                         <label class="visually-hidden" for="topup-amount">مبلغ افزایش موجودی</label>
-                        <input id="topup-amount" type="number" name="amount" step="0.01" min="1" placeholder="مبلغ دلخواه (تومان)">
+                        {{ top_up_form.amount }}
                         <button class="btn btn-primary app-btn" type="submit">
                             <i class="bi bi-plus-circle" aria-hidden="true"></i>
                             افزایش موجودی

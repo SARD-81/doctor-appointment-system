@@ -1,7 +1,8 @@
 from django.contrib import admin
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from apps.appointments.models import Appointment, AppointmentSlot
+from apps.appointments.models import Appointment, AppointmentSlot, AppointmentStatus
 
 
 @admin.register(AppointmentSlot)
@@ -44,8 +45,22 @@ class AppointmentAdmin(admin.ModelAdmin):
         "patient__email",
         "slot__doctor__full_name",
     )
-    readonly_fields = ("booked_at",)
+    readonly_fields = ("booked_at", "completed_at", "completed_by")
     ordering = ("-booked_at",)
+    actions = ("mark_completed",)
+
+    @admin.action(description=_("Mark selected appointments as completed"))
+    def mark_completed(self, request, queryset):
+        eligible = queryset.filter(status=AppointmentStatus.CONFIRMED)
+        updated = eligible.update(
+            status=AppointmentStatus.COMPLETED,
+            completed_at=timezone.now(),
+            completed_by=request.user,
+        )
+        self.message_user(
+            request,
+            _("%(count)d appointment(s) marked completed.") % {"count": updated},
+        )
 
     @admin.display(description=_("Doctor"))
     def doctor_display(self, obj: Appointment) -> str:

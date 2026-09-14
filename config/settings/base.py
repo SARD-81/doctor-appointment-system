@@ -12,8 +12,10 @@ if env_file.exists():
 
 SECRET_KEY = env("SECRET_KEY")
 DEBUG = env.bool("DEBUG", default=False)
+ALLOW_DEMO_DATA = env.bool("ALLOW_DEMO_DATA", default=DEBUG)
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
+CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
 
 
 DJANGO_APPS = [
@@ -88,6 +90,9 @@ DATABASES = {
         "PORT": env("POSTGRES_PORT"),
     }
 }
+CACHES = {
+    "default": env.cache_url("CACHE_URL", default="locmemcache://"),
+}
 AUTHENTICATION_BACKENDS = [
     "apps.accounts.backends.EmailAuthBackend",
     "django.contrib.auth.backends.ModelBackend",
@@ -107,6 +112,13 @@ EMAIL_BACKEND = env(
     "EMAIL_BACKEND",
     default="django.core.mail.backends.console.EmailBackend",
 )
+EMAIL_HOST = env("EMAIL_HOST", default="localhost")
+EMAIL_PORT = env.int("EMAIL_PORT", default=25)
+EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
+EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=False)
+EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", default=False)
+EMAIL_TIMEOUT = env.int("EMAIL_TIMEOUT", default=10)
 DEFAULT_FROM_EMAIL = env(
     "DEFAULT_FROM_EMAIL",
     default="noreply@localhost",

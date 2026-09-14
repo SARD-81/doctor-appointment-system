@@ -2,8 +2,8 @@
     position: sticky;
     top: 0;
     z-index: 1000;
-    border-bottom: 1px solid rgba(220, 230, 236, 0.78);
-    background: rgba(246, 249, 251, 0.88);
+    border-bottom: 1px solid var(--border-78);
+    background: var(--bg-88);
     backdrop-filter: blur(18px);
     transition:
         box-shadow var(--transition),
@@ -11,8 +11,8 @@
 }
 
 .site-header.site-header--scrolled {
-    background: rgba(246, 249, 251, 0.95);
-    box-shadow: 0 10px 28px rgba(16, 42, 67, 0.07);
+    background: var(--bg-95);
+    box-shadow: 0 10px 28px var(--text-shadow-07);
 }
 
 .app-navbar {
@@ -32,8 +32,8 @@
     place-items: center;
     border-radius: 14px;
     background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
-    color: #fff;
-    box-shadow: 0 10px 26px rgba(15, 107, 109, 0.22);
+    color: var(--color-on-primary);
+    box-shadow: 0 10px 26px var(--primary-22);
 }
 
 .app-brand__mark--small {
@@ -127,7 +127,7 @@
 .btn-primary.app-btn:hover,
 .btn-primary.app-btn:focus {
     background: var(--color-primary-hover);
-    box-shadow: 0 10px 24px rgba(15, 107, 109, 0.16);
+    box-shadow: 0 10px 24px var(--primary-16);
 }
 
 .btn-ghost {
@@ -174,7 +174,7 @@
 
 .step-card:hover {
     transform: translateY(-4px);
-    border-color: rgba(15, 107, 109, 0.18);
+    border-color: var(--primary-18);
     box-shadow: var(--shadow-md);
 }
 
@@ -182,7 +182,7 @@
     position: absolute;
     top: 1.2rem;
     left: 1.35rem;
-    color: rgba(15, 107, 109, 0.1);
+    color: var(--primary-10);
     font-size: 3rem;
     font-weight: 900;
     line-height: 1;
@@ -217,7 +217,7 @@
     gap: 3rem;
     align-items: center;
     padding: clamp(2rem, 5vw, 4rem);
-    border: 1px solid rgba(15, 107, 109, 0.1);
+    border: 1px solid var(--primary-10);
     border-radius: var(--radius-lg);
     background: var(--color-surface);
     box-shadow: var(--shadow-md);
@@ -261,7 +261,7 @@
 
 .feature-item:hover {
     transform: translateY(-2px);
-    border-color: rgba(15, 107, 109, 0.18);
+    border-color: var(--primary-18);
     background: var(--color-primary-soft);
 }
 
@@ -279,9 +279,9 @@
     overflow: hidden;
     border-radius: var(--radius-lg);
     background:
-        radial-gradient(circle at 15% 0%, rgba(85, 199, 192, 0.28), transparent 32%),
-        linear-gradient(135deg, #143b55, #0f6b6d);
-    color: #fff;
+        radial-gradient(circle at 15% 0%, var(--accent-28), transparent 32%),
+        linear-gradient(135deg, var(--color-secondary-deep), var(--color-primary));
+    color: var(--color-on-primary);
     box-shadow: var(--shadow-lg);
 }
 
@@ -294,7 +294,7 @@
 
 .cta-panel p {
     margin: 0;
-    color: rgba(255, 255, 255, 0.76);
+    color: var(--surface-76);
 }
 
 .empty-state {
@@ -370,7 +370,7 @@
 }
 
 .rating-inline__star {
-    color: #e1a624;
+    color: var(--color-star);
 }
 
 .rating-inline__count {
@@ -399,7 +399,7 @@
 
 button.slot-chip:hover {
     transform: translateY(-1px);
-    border-color: rgba(15, 107, 109, 0.35);
+    border-color: var(--primary-35);
     background: var(--color-primary-soft);
     color: var(--color-primary-dark);
 }
@@ -407,7 +407,7 @@ button.slot-chip:hover {
 .slot-chip--selected {
     border-color: var(--color-primary);
     background: var(--color-primary);
-    color: #fff;
+    color: var(--color-on-primary);
 }
 
 .slot-chip--disabled {
@@ -432,7 +432,7 @@ button.slot-chip:hover {
 
 .doctor-card:hover {
     transform: translateY(-3px);
-    border-color: rgba(15, 107, 109, 0.2);
+    border-color: var(--primary-20);
     box-shadow: var(--shadow-md);
 }
 
@@ -450,7 +450,7 @@ button.slot-chip:hover {
     place-items: center;
     overflow: hidden;
     border-radius: 20px;
-    background: linear-gradient(135deg, var(--color-primary-soft), #d9f2ef);
+    background: linear-gradient(135deg, var(--color-primary-soft), var(--color-primary-soft-strong));
     color: var(--color-primary-dark);
     font-size: 1.15rem;
     font-weight: 850;
@@ -533,7 +533,7 @@ button.slot-chip:hover {
 .skeleton {
     position: relative;
     overflow: hidden;
-    background: #e7eef2;
+    background: var(--color-skeleton);
 }
 
 .skeleton::after {
@@ -544,7 +544,7 @@ button.slot-chip:hover {
     background: linear-gradient(
         90deg,
         transparent,
-        rgba(255, 255, 255, 0.58),
+        var(--surface-58),
         transparent
     );
     animation: skeleton-shimmer 1.35s infinite;

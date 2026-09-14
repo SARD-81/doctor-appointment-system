@@ -12,9 +12,10 @@ This file records which project artifacts informed Architecture Baseline v1.0 wi
 
 ## Repository reconciliation evidence
 
-- `develop`: custom `User(AbstractUser)` with unique email.
-- `feature/doctor-domain`: current branch still contains later-domain models even though Issue #2 requires the final Doctor boundary to contain only Specialty/Doctor.
-- `feature/account-authentication`: current OTP service provides Email + Django Cache implementation evidence while Issue #15 remains the gate for final authentication-flow review and tests.
+- `develop`: integrated Accounts, Doctors, Appointments, Wallet, and Reviews domains.
+- Migrations: database invariants for email identity, slot uniqueness, financial values, ledger references, payment cardinality, and rating bounds.
+- Services: cache-backed email OTP, atomic booking, locked wallet top-up, and completed-appointment review eligibility.
+- Runtime: PostgreSQL plus shared Redis in production, with Gunicorn and Nginx Compose wiring.
 
 ## Rule
 

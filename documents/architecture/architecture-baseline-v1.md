@@ -2,9 +2,9 @@
 
 **Decision date:** 2026-09-04  
 **Repository versioning date:** 2026-09-06  
-**Status:** Proposed baseline for team/mentor review; not fully frozen  
+**Status:** Accepted implementation baseline
 **Decision participants:** Amir (Team Lead), Mahsa  
-**OTP final review:** pending Amirreza/team confirmation
+**OTP decision:** accepted Email + Django Cache contract; Redis-backed in production
 
 This document is the version-controlled Source of Truth for the project's initial architecture. It preserves the agreed boundaries and contracts and does not treat temporary feature-branch structure as final architecture.
 
@@ -26,8 +26,8 @@ Optional OAuth remains bonus scope and is not required by the baseline.
 ## Repository reconciliation
 
 - On `develop`, `User` derives from Django `AbstractUser` and has unique email; this matches the baseline.
-- Issue #2 requires the Doctor catalog boundary to contain only `Specialty` and `Doctor`. The current `feature/doctor-domain` branch still contains later-domain models, so that branch is treated as work in progress rather than final architecture.
-- The current authentication branch provides implementation evidence for an Email + Django Cache OTP direction with expiry, cooldown, attempt limiting, rate limiting, hashed storage, one-time consumption, registration/OTP/login forms, and a custom email authentication backend. ADR-012 remains pending final review/merge confirmation rather than being silently frozen from branch code.
+- The Doctor catalog owns only `Specialty` and `Doctor`; scheduling, wallet, booking, and review behavior remain in their respective applications.
+- The integrated Accounts domain implements Email + Django Cache OTP with expiry, cooldown, attempt limiting, rate limiting, hashed storage, one-time consumption, registration/OTP/login forms, and a custom email authentication backend. Production uses shared Redis cache across Gunicorn workers.
 
 ## Decision summary
 
@@ -44,7 +44,7 @@ Optional OAuth remains bonus scope and is not required by the baseline.
 | ADR-009 | Admin marks Appointment completed and completion is auditable |
 | ADR-010 | Cancellation/refund are outside baseline scope |
 | ADR-011 | Wallet top-up is simulated; no real payment gateway required |
-| ADR-012 | OTP contract pending final confirmation; current direction is Email + Cache |
+| ADR-012 | Email OTP stored through Django Cache; Redis-backed in production |
 
 Detailed rationale is preserved in [the ADR index](../adr/README.md).
 
@@ -106,15 +106,12 @@ No partial booking or wallet debit may remain after a database failure.
 
 See [Booking Sequence UML](uml-booking-sequence.md).
 
-## Open decisions
+## Deferred decisions
 
-- Final OTP channel/storage/lifecycle contract: Amirreza + team.
 - Extra Doctor fields such as license: only if requirement/mentor requires them.
-- Wallet subsystem reuse details: review before implementation.
-- Final app ownership/naming for later domains: settle before final migrations.
+- Cancellation/refund: requires a separate state-machine and financial ADR.
+- Google OAuth: optional bonus scope and not part of the mandatory baseline.
 
 ## Architecture Freeze v1.0
 
-Full freeze requires all three team members to review the baseline, ADR-012 to be finalized or explicitly deferred, ERD/UML to remain consistent with this baseline, final domain migrations to match the agreed boundaries, Booking implementation to match the transaction/failure contract, and later changes to be recorded through ADR review.
-
-Versioning this documentation does **not** by itself declare the full architecture frozen.
+The integrated models, migrations, services, ERD/UML, and ADR-012 now conform to this baseline. Any later change to a frozen contract must be recorded through ADR review and accompanied by migration and regression-test evidence where applicable.

@@ -2,8 +2,8 @@
     min-height: calc(100vh - 78px);
     padding: clamp(3rem, 6vw, 5.5rem) 0 6rem;
     background:
-        radial-gradient(circle at 92% 8%, rgba(85, 199, 192, 0.13), transparent 26%),
-        radial-gradient(circle at 8% 72%, rgba(23, 59, 87, 0.06), transparent 30%),
+        radial-gradient(circle at 92% 8%, var(--accent-13), transparent 26%),
+        radial-gradient(circle at 8% 72%, var(--secondary-06), transparent 30%),
         var(--color-bg);
 }
 
@@ -35,7 +35,7 @@
     padding: clamp(1rem, 3vw, 1.4rem);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
-    background: rgba(255, 255, 255, 0.94);
+    background: var(--surface-94);
     box-shadow: var(--shadow-md);
     backdrop-filter: blur(14px);
 }
@@ -88,7 +88,7 @@
     gap: 0.55rem;
     margin-top: 0.9rem;
     padding: 0.8rem 1rem;
-    border: 1px solid rgba(33, 118, 174, 0.15);
+    border: 1px solid var(--info-15);
     border-radius: 0.9rem;
     background: var(--color-info-soft);
     color: var(--color-info);
@@ -115,7 +115,7 @@
     min-height: 34px;
     align-items: center;
     padding: 0.35rem 0.75rem;
-    border: 1px solid rgba(15, 107, 109, 0.12);
+    border: 1px solid var(--primary-12);
     border-radius: var(--radius-pill);
     background: var(--color-primary-soft);
     color: var(--color-primary-dark);
@@ -136,15 +136,15 @@
 .doctor-discovery__empty {
     border: 1px dashed var(--color-border-strong);
     border-radius: var(--radius-md);
-    background: rgba(255, 255, 255, 0.72);
+    background: var(--surface-72);
 }
 
 .doctor-detail {
     min-height: calc(100vh - 78px);
     padding: clamp(2.3rem, 5vw, 4.5rem) 0 6rem;
     background:
-        radial-gradient(circle at 86% 8%, rgba(85, 199, 192, 0.12), transparent 28%),
-        radial-gradient(circle at 10% 82%, rgba(23, 59, 87, 0.05), transparent 28%),
+        radial-gradient(circle at 86% 8%, var(--accent-12), transparent 28%),
+        radial-gradient(circle at 10% 82%, var(--secondary-05), transparent 28%),
         var(--color-bg);
 }
 
@@ -173,7 +173,7 @@
 .doctor-slots-panel {
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--surface-95);
     box-shadow: var(--shadow-md);
 }
 
@@ -191,7 +191,7 @@
     height: 86px;
     place-items: center;
     border-radius: 26px;
-    background: linear-gradient(135deg, var(--color-primary-soft), #d9f2ef);
+    background: linear-gradient(135deg, var(--color-primary-soft), var(--color-primary-soft-strong));
     color: var(--color-primary-dark);
     font-size: 1.55rem;
     font-weight: 900;
@@ -299,7 +299,7 @@
 }
 
 .doctor-slot-grid .slot-chip:has(input:focus-visible) {
-    outline: 3px solid rgba(15, 107, 109, 0.18);
+    outline: 3px solid var(--primary-18);
     outline-offset: 2px;
 }
 
@@ -320,13 +320,13 @@
 }
 
 .doctor-slot-feedback--warning {
-    border: 1px solid rgba(173, 113, 0, 0.15);
+    border: 1px solid var(--warning-15);
     background: var(--color-warning-soft);
     color: var(--color-warning);
 }
 
 .doctor-slot-feedback--success {
-    border: 1px solid rgba(22, 128, 78, 0.14);
+    border: 1px solid var(--success-14);
     background: var(--color-success-soft);
     color: var(--color-success);
 }

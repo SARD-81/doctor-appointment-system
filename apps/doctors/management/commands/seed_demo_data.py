@@ -1,7 +1,8 @@
-from datetime import timedelta
+from datetime import datetime, time, timedelta
 from decimal import Decimal
 
-from django.core.management.base import BaseCommand
+from django.conf import settings
+from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
 
 from apps.appointments.models import AppointmentSlot
@@ -12,6 +13,9 @@ class Command(BaseCommand):
     help = "Create deterministic demo data for local development."
 
     def handle(self, *args, **options):
+        if not settings.ALLOW_DEMO_DATA:
+            raise CommandError("seed_demo_data is disabled in this environment.")
+
         specialties = [
             "Cardiology",
             "Dermatology",
@@ -40,22 +44,23 @@ class Command(BaseCommand):
             for name, specialty in doctors
         ]
 
-        now = timezone.now()
+        local_today = timezone.localdate()
+        current_timezone = timezone.get_current_timezone()
+        slot_times = (
+            (local_today + timedelta(days=1), time(hour=9), True),
+            (local_today - timedelta(days=1), time(hour=9), True),
+            (local_today + timedelta(days=2), time(hour=14), False),
+        )
         for doctor in created_doctors:
-            AppointmentSlot.objects.get_or_create(
-                doctor=doctor,
-                starts_at=now + timedelta(days=1),
-                defaults={"is_active": True},
-            )
-            AppointmentSlot.objects.get_or_create(
-                doctor=doctor,
-                starts_at=now - timedelta(days=1),
-                defaults={"is_active": True},
-            )
-            AppointmentSlot.objects.get_or_create(
-                doctor=doctor,
-                starts_at=now + timedelta(days=2),
-                defaults={"is_active": False},
-            )
+            for slot_date, slot_time, is_active in slot_times:
+                starts_at = timezone.make_aware(
+                    datetime.combine(slot_date, slot_time),
+                    current_timezone,
+                )
+                AppointmentSlot.objects.update_or_create(
+                    doctor=doctor,
+                    starts_at=starts_at,
+                    defaults={"is_active": is_active},
+                )
 
         self.stdout.write(self.style.SUCCESS("Demo data created successfully."))

@@ -1,6 +1,7 @@
 import pytest
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.urls import reverse
 
 
 def test_project_uses_custom_user_model():
@@ -24,3 +25,11 @@ def test_custom_user_can_be_created():
     assert user.pk is not None
     assert user.email == "smoke@example.com"
     assert user.check_password("StrongTestPassword123!")
+
+
+def test_health_check_is_public_and_never_cached(client):
+    response = client.get(reverse("health_check"))
+
+    assert response.status_code == 200
+    assert response.json() == {"status": "ok"}
+    assert "no-cache" in response.headers["Cache-Control"]

@@ -3,8 +3,8 @@
 
 body {
     background:
-        radial-gradient(circle at 86% 8%, rgba(85, 199, 192, 0.12), transparent 28%),
-        radial-gradient(circle at 10% 82%, rgba(23, 59, 87, 0.05), transparent 28%),
+        radial-gradient(circle at 86% 8%, var(--accent-12), transparent 28%),
+        radial-gradient(circle at 10% 82%, var(--secondary-05), transparent 28%),
         var(--color-bg);
     background-attachment: fixed;
 }
@@ -25,12 +25,12 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0.6rem 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.55);
+    border: 1px solid var(--surface-55);
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.72);
+    background: var(--surface-72);
     box-shadow:
-        0 20px 45px rgba(15, 107, 109, 0.12),
-        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        0 20px 45px var(--primary-12),
+        inset 0 1px 0 var(--surface-80);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
 }
@@ -51,9 +51,9 @@ body {
     place-items: center;
     border-radius: 14px;
     background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
-    color: #ffffff;
+    color: var(--color-on-primary);
     font-size: 1.1rem;
-    box-shadow: 0 8px 18px rgba(15, 107, 109, 0.28);
+    box-shadow: 0 8px 18px var(--primary-28);
 }
 
 .site-nav__title {
@@ -109,6 +109,29 @@ body {
     margin-inline-start: auto;
 }
 
+.site-nav__theme-toggle {
+    display: inline-grid;
+    width: 2.7rem;
+    height: 2.7rem;
+    flex: 0 0 auto;
+    place-items: center;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-pill);
+    background: var(--color-surface);
+    color: var(--color-primary);
+    cursor: pointer;
+}
+
+.site-nav__theme-toggle:hover {
+    border-color: var(--color-primary);
+    background: var(--color-primary-soft);
+}
+
+.site-nav__theme-toggle:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
+}
+
 .site-nav__user {
     display: inline-flex;
     align-items: center;
@@ -133,7 +156,7 @@ body {
     border: none;
     border-radius: var(--radius-pill);
     background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
-    color: #ffffff;
+    color: var(--color-on-primary);
     cursor: pointer;
     font: inherit;
     font-size: 0.85rem;
@@ -144,7 +167,7 @@ body {
 
 .site-nav__cta:hover {
     transform: translateY(-1px);
-    box-shadow: 0 12px 24px rgba(15, 107, 109, 0.3);
+    box-shadow: 0 12px 24px var(--primary-30);
 }
 
 .site-nav__cta--ghost {

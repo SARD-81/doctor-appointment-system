@@ -94,6 +94,40 @@ class TestAppointmentSlotModel:
         slot.save()
         assert slot.is_available is False
 
+    def test_past_slot_is_not_available(self, doctor):
+        past_slot = AppointmentSlot.objects.create(
+            doctor=doctor,
+            starts_at=timezone.now() - timedelta(minutes=1),
+            is_active=True,
+        )
+
+        assert past_slot.is_available is False
+
+    def test_admin_completion_action_sets_audit_fields(
+        self, admin_user, patient, slot, monkeypatch
+    ):
+        from django.contrib.admin.sites import AdminSite
+        from django.test import RequestFactory
+
+        from apps.appointments.admin import AppointmentAdmin
+
+        appointment = Appointment.objects.create(
+            patient=patient,
+            slot=slot,
+            amount_paid=Decimal("50000.00"),
+        )
+        request = RequestFactory().post("/admin/apps/appointments/")
+        request.user = admin_user
+        model_admin = AppointmentAdmin(Appointment, AdminSite())
+        monkeypatch.setattr(model_admin, "message_user", lambda *args, **kwargs: None)
+
+        model_admin.mark_completed(request, Appointment.objects.filter(pk=appointment.pk))
+
+        appointment.refresh_from_db()
+        assert appointment.status == AppointmentStatus.COMPLETED
+        assert appointment.completed_at is not None
+        assert appointment.completed_by == admin_user
+
 
 # --- تست‌های مدل Appointment ---
 

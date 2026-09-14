@@ -49,6 +49,7 @@ class UserRegisterForm(forms.ModelForm):
         """اعتبارسنجی یکتایی ایمیل به صورت غیرحساس به حروف بزرگ و کوچک (Case-Insensitive)."""
         email = self.cleaned_data.get("email")
         if email:
+            email = email.lower()
             if User.objects.filter(email__iexact=email).exists():
                 raise forms.ValidationError("این ایمیل قبلاً ثبت‌ نام کرده است.")
         return email

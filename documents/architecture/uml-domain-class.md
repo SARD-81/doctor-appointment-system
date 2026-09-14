@@ -48,9 +48,9 @@ classDiagram
     }
 
     class OTPService {
-        <<service / persistence pending final ADR>>
-        +request(identifier)
-        +verify(identifier, code)
+        <<service / cache-backed>>
+        +request(email)
+        +verify(email, code)
     }
 
     class BookingService {
