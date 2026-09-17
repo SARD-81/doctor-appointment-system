@@ -1,6 +1,12 @@
 """Prepare the isolated Vercel preview environment during deployment."""
 
 import os
+import sys
+from pathlib import Path
+
+ROOT_DIR = Path(__file__).resolve().parent.parent
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
 
 # Migrations must use Neon's direct connection rather than the pooled runtime URL.
 unpooled_database_url = os.environ.get("DATABASE_URL_UNPOOLED")
