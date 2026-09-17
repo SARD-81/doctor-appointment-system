@@ -134,8 +134,9 @@ database cache so verification works across Vercel serverless function instances
 
 Public preview users must receive OTP and booking-confirmation emails for real. Unlike
 local development, the Vercel preview does **not** allow Django's console email backend.
-The preview fails fast during configuration when the SMTP password or sender address is
-missing, preventing a deployment that would strand remote users at the OTP screen.
+The preview fails fast during configuration when the SMTP username, password, or sender
+address is missing, preventing a deployment that would strand remote users at the OTP
+screen.
 
 For a Neon-backed preview, configure these Vercel environment variables as secrets:
 
@@ -150,25 +151,27 @@ TIME_ZONE=Asia/Tehran
 by the Vercel build bootstrap for schema migrations. Never commit either connection string
 or the real `SECRET_KEY`.
 
-The default preview SMTP profile is compatible with Resend. After verifying a sending
-domain and creating a Resend API key, configure:
+For the zero-cost bootcamp demo, the default preview SMTP profile uses Gmail SMTP. Use a
+separate Gmail account when practical, enable Google 2-Step Verification for that account,
+create an App Password, and store that App Password only as a Vercel secret:
 
 ```text
 EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
-EMAIL_HOST=smtp.resend.com
-EMAIL_PORT=465
-EMAIL_HOST_USER=resend
-EMAIL_HOST_PASSWORD=<resend-api-key>
-EMAIL_USE_TLS=False
-EMAIL_USE_SSL=True
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_HOST_USER=<demo-gmail-address>
+EMAIL_HOST_PASSWORD=<google-app-password>
+EMAIL_USE_TLS=True
+EMAIL_USE_SSL=False
 EMAIL_TIMEOUT=10
-DEFAULT_FROM_EMAIL=Doctor Appointment <noreply@your-verified-domain.example>
+DEFAULT_FROM_EMAIL=<demo-gmail-address>
 ```
 
-`EMAIL_HOST_PASSWORD` is the Resend API key and must remain a Vercel secret. The sender in
-`DEFAULT_FROM_EMAIL` must belong to a domain authorized by the email provider. A different
-SMTP provider can be used by overriding the same environment variables; the application
-code continues to use Django's standard `send_mail()` path.
+Do not commit or paste the App Password into repository files, issue comments, build logs,
+or documentation. If an App Password is ever exposed, revoke it and generate a new one
+before deployment. A different SMTP provider can still be used by overriding the same
+environment variables; the application code continues to use Django's standard
+`send_mail()` path.
 
 Vercel automatically exposes the `VERCEL` environment flag. The project uses it to select
 preview settings for WSGI and management commands. During each Vercel build,
