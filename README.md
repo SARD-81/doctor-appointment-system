@@ -125,13 +125,17 @@ Compose files.
 
 ## Vercel preview / demo deployment
 
-Vercel is supported as a **non-production preview environment** only. The real production
-contract remains the Docker + Gunicorn + Nginx topology documented below.
+Vercel is supported as a **non-production public preview environment** only. The real
+production contract remains the Docker + Gunicorn + Nginx topology documented below.
 
 The preview environment uses `config.settings.preview`, which keeps `DEBUG=False`, secure
-cookies and HTTPS redirects, but intentionally avoids the production-only Redis and SMTP
-requirements. OTP/rate-limit cache state is stored in a shared PostgreSQL database cache
-so it remains available across serverless function instances.
+cookies and HTTPS redirects, while keeping OTP/rate-limit state in the shared PostgreSQL
+database cache so verification works across Vercel serverless function instances.
+
+Public preview users must receive OTP and booking-confirmation emails for real. Unlike
+local development, the Vercel preview does **not** allow Django's console email backend.
+The preview fails fast during configuration when the SMTP password or sender address is
+missing, preventing a deployment that would strand remote users at the OTP screen.
 
 For a Neon-backed preview, configure these Vercel environment variables as secrets:
 
@@ -146,20 +150,25 @@ TIME_ZONE=Asia/Tehran
 by the Vercel build bootstrap for schema migrations. Never commit either connection string
 or the real `SECRET_KEY`.
 
-Optional email variables can be added when end-to-end OTP delivery is required:
+The default preview SMTP profile is compatible with Resend. After verifying a sending
+domain and creating a Resend API key, configure:
 
 ```text
 EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
-EMAIL_HOST=<smtp-host>
-EMAIL_PORT=587
-EMAIL_HOST_USER=<smtp-user>
-EMAIL_HOST_PASSWORD=<smtp-password>
-EMAIL_USE_TLS=True
-DEFAULT_FROM_EMAIL=<sender-address>
+EMAIL_HOST=smtp.resend.com
+EMAIL_PORT=465
+EMAIL_HOST_USER=resend
+EMAIL_HOST_PASSWORD=<resend-api-key>
+EMAIL_USE_TLS=False
+EMAIL_USE_SSL=True
+EMAIL_TIMEOUT=10
+DEFAULT_FROM_EMAIL=Doctor Appointment <noreply@your-verified-domain.example>
 ```
 
-Without SMTP variables, preview deployments keep Django's console email backend. Public
-pages remain usable, but a remote visitor cannot receive OTP email directly.
+`EMAIL_HOST_PASSWORD` is the Resend API key and must remain a Vercel secret. The sender in
+`DEFAULT_FROM_EMAIL` must belong to a domain authorized by the email provider. A different
+SMTP provider can be used by overriding the same environment variables; the application
+code continues to use Django's standard `send_mail()` path.
 
 Vercel automatically exposes the `VERCEL` environment flag. The project uses it to select
 preview settings for WSGI and management commands. During each Vercel build,
@@ -171,7 +180,7 @@ preview settings for WSGI and management commands. During each Vercel build,
 4. `collectstatic`.
 
 Local and Docker environments continue to use the existing `POSTGRES_*` variables whenever
-`DATABASE_URL` is empty.
+`DATABASE_URL` is empty. Their console-email development behavior is unchanged.
 
 ## Production deployment
 
