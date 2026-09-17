@@ -80,6 +80,14 @@ jobs:
       - name: Apply migrations
         run: python manage.py migrate --noinput
 
+      - name: Validate Vercel preview build
+        env:
+          VERCEL: "1"
+          SECRET_KEY: ci-preview-secret-key-with-more-than-fifty-characters
+          DATABASE_URL: postgresql://doctor_app:doctor_app_test_password@127.0.0.1:5432/doctor_appointment
+          DATABASE_URL_UNPOOLED: postgresql://doctor_app:doctor_app_test_password@127.0.0.1:5432/doctor_appointment
+        run: python scripts/vercel_build.py
+
       - name: Check production settings
         env:
           DJANGO_SETTINGS_MODULE: config.settings.production
