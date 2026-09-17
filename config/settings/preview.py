@@ -5,9 +5,21 @@ ALLOW_DEMO_DATA = True
 
 # Vercel preview deployments receive unique *.vercel.app hostnames. Keep this
 # relaxed host/origin policy isolated from the real production settings.
-ALLOWED_HOSTS = list(dict.fromkeys([*ALLOWED_HOSTS, ".vercel.app"]))  # noqa: F405
-CSRF_TRUSTED_ORIGINS = list(  # noqa: F405
-    dict.fromkeys([*CSRF_TRUSTED_ORIGINS, "https://*.vercel.app"])
+ALLOWED_HOSTS = list(
+    dict.fromkeys(
+        [
+            *ALLOWED_HOSTS,  # noqa: F405
+            ".vercel.app",
+        ]
+    )
+)
+CSRF_TRUSTED_ORIGINS = list(
+    dict.fromkeys(
+        [
+            *CSRF_TRUSTED_ORIGINS,  # noqa: F405
+            "https://*.vercel.app",
+        ]
+    )
 )
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
