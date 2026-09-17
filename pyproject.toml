@@ -2,6 +2,8 @@
 name = "doctor-appointment-system"
 version = "0.1.0"
 requires-python = ">=3.12"
+# Vercel uses uv when pyproject.toml is present. Keep this runtime dependency
+# list synchronized with requirements.txt.
 dependencies = [
     "asgiref==3.12.1",
     "Django==5.2.17",
