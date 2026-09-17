@@ -123,6 +123,56 @@ pip-audit -r requirements-dev.txt --progress-spinner off
 CI runs these checks against PostgreSQL and also validates production settings and both
 Compose files.
 
+## Vercel preview / demo deployment
+
+Vercel is supported as a **non-production preview environment** only. The real production
+contract remains the Docker + Gunicorn + Nginx topology documented below.
+
+The preview environment uses `config.settings.preview`, which keeps `DEBUG=False`, secure
+cookies and HTTPS redirects, but intentionally avoids the production-only Redis and SMTP
+requirements. OTP/rate-limit cache state is stored in a shared PostgreSQL database cache
+so it remains available across serverless function instances.
+
+For a Neon-backed preview, configure these Vercel environment variables as secrets:
+
+```text
+SECRET_KEY=<unique-random-secret>
+DATABASE_URL=<pooled-neon-connection-string>
+DATABASE_URL_UNPOOLED=<direct-neon-connection-string>
+TIME_ZONE=Asia/Tehran
+```
+
+`DATABASE_URL` is used by normal application traffic. `DATABASE_URL_UNPOOLED` is used only
+by the Vercel build bootstrap for schema migrations. Never commit either connection string
+or the real `SECRET_KEY`.
+
+Optional email variables can be added when end-to-end OTP delivery is required:
+
+```text
+EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+EMAIL_HOST=<smtp-host>
+EMAIL_PORT=587
+EMAIL_HOST_USER=<smtp-user>
+EMAIL_HOST_PASSWORD=<smtp-password>
+EMAIL_USE_TLS=True
+DEFAULT_FROM_EMAIL=<sender-address>
+```
+
+Without SMTP variables, preview deployments keep Django's console email backend. Public
+pages remain usable, but a remote visitor cannot receive OTP email directly.
+
+Vercel automatically exposes the `VERCEL` environment flag. The project uses it to select
+preview settings for WSGI and management commands. During each Vercel build,
+`scripts/vercel_build.py` runs the following against the isolated preview database:
+
+1. Django migrations using `DATABASE_URL_UNPOOLED` when available;
+2. creation of the shared database cache table;
+3. idempotent demo doctor/specialty/slot seeding;
+4. `collectstatic`.
+
+Local and Docker environments continue to use the existing `POSTGRES_*` variables whenever
+`DATABASE_URL` is empty.
+
 ## Production deployment
 
 The production Compose topology contains:
@@ -172,9 +222,9 @@ docker compose -f compose.production.yml run --rm web python manage.py check --d
 
 ## Repository workflow
 
-`develop` is the integration branch and `main` is release-ready. Work is performed on
-short-lived issue branches and enters `develop` through reviewed, green pull requests.
-See [the Git workflow](documents/git-workflow.md) and
+The repository's current release baseline is `main`. Work is performed on short-lived
+issue branches and merged through reviewed, green pull requests. See
+[the Git workflow](documents/git-workflow.md) and
 [Definition of Done](documents/definition-of-done.md).
 
 ## Project layout
