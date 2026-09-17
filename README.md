@@ -128,6 +128,10 @@ Compose files.
 Vercel is supported as a **non-production public preview environment** only. The real
 production contract remains the Docker + Gunicorn + Nginx topology documented below.
 
+Current bootcamp demo URL:
+
+- <https://doctor-appointment-system-sigma-puce.vercel.app/>
+
 The preview environment uses `config.settings.preview`, which keeps `DEBUG=False`, secure
 cookies and HTTPS redirects, while keeping OTP/rate-limit state in the shared PostgreSQL
 database cache so verification works across Vercel serverless function instances.
