@@ -22,7 +22,7 @@ from django.core.management import call_command  # noqa: E402
 def main():
     django.setup()
     call_command("migrate", interactive=False)
-    call_command("createcachetable", interactive=False)
+    call_command("createcachetable")
     call_command("seed_demo_data")
     call_command("collectstatic", interactive=False)
 
